@@ -1,0 +1,284 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemsex: Reducción de Daños (Info Saludable)</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos personalizados para la app */
+        :root {
+            --color-primary: #f87171; /* Coral Suave, moderno y amigable */
+            --color-danger: #ef4444;  /* Rojo estándar para riesgos críticos */
+            --color-background: #1A202C; /* Deep Navy */
+        }
+        
+        /* Fondo con gradiente sutil y profundo */
+        body {
+            background-color: var(--color-background); /* Deep Navy */
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .header-shadow {
+            /* Sombra suave y sutil */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
+        }
+        .scroll-container {
+            /* Asegura que el contenido sea desplazable dentro de la vista móvil */
+            height: calc(100vh - 90px); /* Altura de la vista menos la altura del header/footer */
+            overflow-y: auto;
+        }
+        
+        /* Efecto de un botón activo, con escala y color primario */
+        .active-button {
+            color: white !important;
+            background-color: var(--color-primary);
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(248, 113, 113, 0.4); /* Sombra suave de coral */
+        }
+        
+        /* Transición para el área de contenido */
+        .content-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+
+        /* Estilo específico para la sección Slam para acentuar el riesgo */
+        .slam-card {
+            background-color: #3b0707; /* Rojo muy oscuro, casi negro, para el peligro */
+            border: 2px solid var(--color-danger);
+        }
+    </style>
+    <!-- CONFIGURACIÓN PWA (Progressive Web App) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="theme-color" content="#1A202C">
+    <!-- El manifiesto se genera en el script de abajo -->
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'background': '#1A202C', /* Deep Navy */
+                        'card': '#2D3748',     /* Dark Card Background */
+                        'primary': '#f87171',  /* New Coral */
+                        'danger': '#ef4444',   /* Red */
+                    }
+                }
+            }
+        }
+
+
+        // --- Base de datos de información de drogas con íconos ---
+        const drugData = {
+            "introduccion": {
+                title: "Introducción: Decisión Informada",
+                icon: "🛡️", // Escudo de protección
+                content: (icon) => `
+                    <div class="text-6xl text-center mb-6">${icon}</div>
+                    <p class="mb-4 text-gray-300">¡Hola! Esta aplicación la hemos creado para ser un espacio seguro, sin juicios, donde puedes encontrar información honesta sobre el chemsex, que es cuando se mezclan prácticas sexuales con ciertas drogas recreativas.</p>
+                    <p class="mb-6 text-gray-300">Sabemos que es un tema delicado, pero si te informas bien, puedes tomar mejores decisiones. Nuestro objetivo es darte datos claros sobre los riesgos (físicos, mentales y de **ITS** – Infecciones de Transmisión Sexual) para que puedas cuidarte. **Ojo: esta app no reemplaza, bajo ningún concepto, el consejo de un médico o terapeuta.**</p>
+                    <div class="bg-card p-4 rounded-xl border-l-4 border-primary shadow-lg">
+                        <h3 class="font-bold text-lg text-primary mb-2 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            Consejos para Cuidarte
+                        </h3>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1 ml-4 text-sm">
+                            <li>Intenta no consumir nunca solo o sola.</li>
+                            <li>Asegúrate de tener siempre un plan para salir de la sesión si algo va mal ("out plan").</li>
+                            <li>Infórmate bien de cómo interaccionan las sustancias con los medicamentos que tomes (como la **PrEP**).</li>
+                            <li>Mantente hidratado, es muy importante.</li>
+                            <li>Ten siempre a mano los contactos de ayuda (los encontrarás en la última pestaña).</li>
+                        </ul>
+                    </div>
+                `
+            },
+            "ghb-gbl": {
+                title: "GHB y GBL: Cuidado con la Dosis",
+                icon: "💧", // Gota de líquido
+                content: (icon) => `
+                    <div class="text-6xl text-center mb-6">${icon}</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">La Dosis es muy traicionera</h3>
+                    <p class="mb-4 text-gray-300">El GHB/GBL son drogas que te relajan mucho. Lo que las hace peligrosas es que hay muy poca diferencia entre la dosis que te da el subidón y la dosis de sobredosis. El mayor riesgo es que te duermas profundamente o entres en coma, lo que se llama **"G-out"**.</p>
+                    
+                    <div class="bg-danger/20 p-4 rounded-xl border-l-4 border-danger mb-4 shadow-lg">
+                        <h4 class="font-bold text-xl text-danger mb-2">🚨 Alerta: Cómo actuar en un 'G-Out'</h4>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1 ml-4">
+                            <li>**Síntomas de Sobredosis:** Si alguien vomita, respira muy lento, o se desploma de repente y no responde.</li>
+                            <li>**Tu Acción:** Ponle de lado (posición lateral de seguridad) para que no se ahogue si vomita. **LLAMA AL 112 INMEDIATAMENTE.** ¡Es una emergencia!</li>
+                        </ul>
+                    </div>
+                    <p class="text-gray-300 mt-4">**Interacciones Mortales:** NUNCA lo mezcles con alcohol, pastillas para dormir (benzodiacepinas) o cualquier cosa que te relaje. La combinación puede parar tu respiración.</p>
+                `
+            },
+            "metanfetamina": {
+                title: "Metanfetamina: Riesgo Cardíaco y Desgaste",
+                icon: "⚡", // Rayo de energía
+                content: (icon) => `
+                    <div class="text-6xl text-center mb-6">${icon}</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">El 'Turbo' que Agota el Cuerpo</h3>
+                    <p class="mb-4 text-gray-300">La meta es un estimulante muy potente. Hace que las sesiones duren muchísimo, lo que te deja totalmente agotado, deshidratado y puede afectar seriamente a tu cabeza (paranoia, ansiedad). Además, es muy fácil volverse adicto.</p>
+                    
+                    <div class="bg-card p-4 rounded-xl border-l-4 border-primary mb-4 shadow-lg">
+                        <h4 class="font-bold text-xl text-primary mb-2 flex items-center">
+                            Riesgos Físicos y Mentales
+                        </h4>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1 ml-4">
+                            <li>**Corazón:** Acelera el corazón peligrosamente y sube la tensión. Podría haber un riesgo de infarto o derrame.</li>
+                            <li>**Paranoia:** Puede causar miedo extremo y desconfianza (psicosis).</li>
+                            <li>**Físico:** Apretamiento de mandíbula (bruxismo) y llagas o heridas por tocarse mucho la piel.</li>
+                        </ul>
+                    </div>
+                    <p class="text-gray-300 mt-4">**El 'Bajón':** Después de una sesión, la caída puede ser muy dura, con mucha depresión y ganas de volver a consumir. Busca apoyo en este momento, no tienes que pasarlo solo.</p>
+                `
+            },
+            "mefedrona": {
+                title: "Mefedrona (Mefe): La Ansiedad por Repetir",
+                icon: "💊", // Pastilla
+                content: (icon) => `
+                    <div class="text-6xl text-center mb-6">${icon}</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">El Empatía que se va rápido</h3>
+                    <p class="mb-4 text-gray-300">La mefedrona te hace sentir muy cercano y eufórico, pero su efecto dura poco. Esto provoca una ansiedad muy fuerte por volver a tomar una dosis, lo que aumenta muchísimo los riesgos de sobrecalentamiento y toxicidad en tu cuerpo.</p>
+                    
+                    <div class="bg-danger/20 p-4 rounded-xl border-l-4 border-danger mb-4 shadow-lg">
+                        <h4 class="font-bold text-xl text-danger mb-2">⚠️ Cuidado con la Fiebre (Serotonina)</h4>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1 ml-4">
+                            <li>**Riesgo:** Si mezclas con ciertos antidepresivos (ISRS), puedes provocar una reacción muy peligrosa (Síndrome Serotoninérgico).</li>
+                            <li>**Síntomas:** Temblor, confusión y fiebre muy alta. Si esto ocurre, hay que buscar ayuda médica urgente.</li>
+                        </ul>
+                    </div>
+                    <p class="text-gray-300 mt-4">**Para Cuidarte:** Es normal que sientas frío en manos y pies (vasoconstricción). Controla la temperatura, hidrátate constantemente y, sobre todo, intenta ponerte un límite claro para no caer en la redosificación constante.</p>
+                `
+            },
+            "slam": {
+                title: "Slam: Información Crítica",
+                icon: "💉", // Jeringa
+                content: (icon) => `
+                    <div class="text-6xl text-center mb-6">${icon}</div>
+                    <h3 class="text-2xl font-bold text-danger mb-4">🚫 El Máximo Riesgo de Infección y OD</h3>
+                    <p class="mb-4 text-gray-300">El "Slam" es el uso de drogas por vía intravenosa (inyectadas). Es la práctica con mayor peligro. El efecto llega inmediatamente al cerebro, lo que no te da tiempo a reaccionar ante una dosis excesiva. Además, los riesgos de infección son muy altos.</p>
+                    
+                    <div class="slam-card p-4 rounded-xl border-l-4 border-danger mb-4 shadow-xl">
+                        <h4 class="font-bold text-xl text-danger mb-2">🔴 Peligros del Slam</h4>
+                        <ul class="list-disc list-inside text-gray-100 space-y-2 ml-4">
+                            <li>**ITS y VHC:** Es el mayor riesgo de transmisión por compartir jeringuillas, filtros o agua. La Hepatitis C (VHC) es una gran preocupación.</li>
+                            <li>**Infecciones Graves:** Puedes tener abscesos o infecciones en la sangre (sepsis) si el material no es 100% estéril.</li>
+                            <li>**Sobredosis (OD):** El riesgo de una sobredosis fatal aumenta muchísimo por la rapidez con la que actúa la droga.</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="text-gray-300 mt-6 font-bold text-primary">Si consumes por esta vía, la Reducción de Daños es VITAL:</p>
+                    <ul class="list-disc list-inside text-gray-400 space-y-1 ml-4 text-sm">
+                        <li>Utiliza **SIEMPRE** material estéril (jeringuillas, filtros, agua) y nuevo para cada persona y cada uso.</li>
+                        <li>Busca programas de intercambio de jeringas en tu ciudad.</li>
+                    </ul>
+                `
+            },
+            "recursos": {
+                title: "Ayuda: Contactos Locales (Gran Canaria)",
+                icon: "❤️", // Corazón de apoyo
+                content: (icon) => `
+                    <div class="text-6xl text-center mb-6">${icon}</div>
+                    <p class="mb-4 text-gray-300">Recuerda: pedir ayuda o información es un acto de valentía. Si estás en Gran Canaria, estos recursos te ofrecen apoyo confidencial, sin juicios, sobre chemsex, adicciones, PrEP, o salud sexual.</p>
+                    
+                    <div class="space-y-4">
+                        
+                        <div class="bg-card p-4 rounded-xl border-l-4 border-danger shadow-lg">
+                            <h4 class="font-bold text-lg text-danger mb-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg>
+                                Servicios de Emergencia
+                            </h4>
+                            <p class="text-white text-3xl font-extrabold">112</p>
+                            <p class="text-gray-400">Emergencias general en España. No dudes en llamar ante un "G-out" o cualquier sobredosis.</p>
+                        </div>
+
+
+                        <!-- RECURSO TELEGRAM (APOYO ENTRE USUARIOS) -->
+                        <div class="bg-card p-4 rounded-xl border-l-4 border-primary shadow-lg">
+                            <h4 class="font-bold text-lg text-primary mb-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12A10 10 0 0 1 12 2a10 10 0 0 0 0 20 10 10 0 0 0 10-10z"/><path d="M16 8l-2 5-6 2 4-7 4-5z"/></svg>
+                                Grupo de Apoyo de Usuarios (Telegram)
+                            </h4>
+                            <p class="text-gray-200 font-medium">Un espacio seguro para hablar con otros usuarios o ex-usuarios que entienden tu situación. El apoyo entre pares es muy valioso.</p>
+                            <a href="https://t.me/+nUYvXYtNhgNiMmE0" target="_blank" class="text-primary underline hover:text-primary/80 transition duration-150 block mt-2">👉 Acceder al grupo de Telegram</a>
+                        </div>
+
+
+
+
+                        <!-- RECURSO LOCAL 1: YRICHEN (Especializado en Chemsex) -->
+                        <div class="bg-card p-4 rounded-xl border-l-4 border-primary shadow-lg">
+                            <h4 class="font-bold text-lg text-primary mb-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2"/><path d="M9 10a2 2 0 1 1 0 4h6a2 2 0 1 1 0-4"/><path d="M22 4s-2.5 3.5-2.5 5.5S22 17 22 17H2c0 0 2.5-5.5 2.5-7.5S2 4 2 4Z"/></svg>
+                                Fundación Canaria Yrichen (Chemsex Support)
+                            </h4>
+                            <p class="text-gray-200 font-medium">Asesoramiento y terapia sobre adicciones y chemsex.</p>
+                            <p class="text-gray-400 text-sm mt-1">UAD San Bartolomé de Tirajana (El Tablero):</p>
+                            <a href="tel:+34928723400" class="text-primary underline hover:text-primary/80 transition duration-150 block">📞 928 723 400 (ext 1680)</a>
+                            <a href="mailto:chemsex@yrichen.org" class="text-primary underline hover:text-primary/80 transition duration-150 block">✉️ chemsex@yrichen.org</a>
+                        </div>
+                        
+                        <!-- RECURSO LOCAL 2: COLECTIVO GAMÁ (Salud Sexual) -->
+                        <div class="bg-card p-4 rounded-xl border-l-4 border-primary shadow-lg">
+                            <h4 class="font-bold text-lg text-primary mb-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/><path d="M12 8v8M8 12h8"/></svg>
+                                Colectivo Gamá
+                            </h4>
+                            <p class="text-gray-200 font-medium">Servicio de Orientación y Apoyo LGTBI+ en Las Palmas.</p>
+                            <p class="text-gray-400 text-sm mt-1">Soporte en salud sexual y prevención de ITS.</p>
+                            <a href="tel:+34928433427" class="text-primary underline hover:text-primary/80 transition duration-150 block">📞 928 433 427</a>
+                            <a href="https://colectivogama.com/" target="_blank" class="text-primary underline hover:text-primary/80 transition duration-150 block">🌐 Web Oficial</a>
+                        </div>
+
+
+                        <!-- RECURSO NACIONAL: ENERGY CONTROL (Reducción de Daños General) -->
+                        <div class="bg-card p-4 rounded-xl border-l-4 border-primary shadow-lg">
+                            <h4 class="font-bold text-lg text-primary mb-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/><path d="M12 8v8M8 12h8"/></svg>
+                                Reducción de Daños (Energy Control)
+                            </h4>
+                            <a href="https://www.energycontrol.org/" target="_blank" class="text-primary underline hover:text-primary/80 transition duration-150 block">Energy Control (Web Oficial)</a>
+                            <p class="text-gray-400 text-sm mt-1">Línea de información, testeo de sustancias y asesoramiento en reducción de daños a nivel nacional.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+
+        // --- Funciones de la aplicación ---
+        let currentView = 'introduccion';
+
+
+        function renderContent(viewId) {
+            const data = drugData[viewId];
+            if (!data) return;
+
+
+            const contentArea = document.getElementById('content-area');
+
+
+            // Paso 1: Fade out (Opacidad 0) para iniciar la transición
+            contentArea.style.opacity = '0';
+            contentArea.style.transform = 'translateY(10px)';
+            
+            // Esperar el fade-out antes de cambiar el contenido (300ms)
+            setTimeout(() => {
+                currentView = viewId;
+                document.getElementById('content-title').innerText = data.title;
+                // Renderizar el contenido, pasando el ícono de la sección
+                contentArea.innerHTML = data.content(data.icon);
+                
+                // Paso 2: Actualizar botones de navegación y añadir el "active-button"
+                const buttons = document.querySelectorAll('#nav-buttons button');
+                buttons.forEach(button => {
+                    // Limpiar clases de activo
+                    button.classList.remove('active-button');
+                    button.classList.add('bg-card', 'text-gray-300', 'hover:bg-gray-700');
+
+
+                    if (button.dataset.view === viewId) {
+                        // Aplicar clases de activo y eliminar las de inactivo
+                        button.classList.remove('bg-card', 'text-gray-300', 'hover:
