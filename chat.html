@@ -102,6 +102,9 @@
             border-radius: 18px;
             margin-bottom: 0.5rem;
             line-height: 1.4;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.3s forwards;
         }
 
         .bot-message {
@@ -110,12 +113,32 @@
             align-self: flex-start; /* Alinea a la izquierda */
         }
         
-        /* (Clase para futuros mensajes del usuario) */
         .user-message {
             background-color: #007bff;
             color: white;
             align-self: flex-end; /* Alinea a la derecha */
         }
+
+        /* Animación de "escribiendo..." */
+        .typing-indicator {
+            align-self: flex-start;
+            margin-bottom: 0.5rem;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #aaa;
+            margin: 0 2px;
+            animation: bounce 1s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
 
         #chat-input-area {
             display: flex;
@@ -192,7 +215,7 @@
             <div class="message bot-message">
                 <p>Hola. Soy un asistente virtual de apoyo e información. Estoy aquí para escucharte y ayudarte con dudas sobre chemsex y bienestar emocional. ¿Cómo te sientes hoy?</p>
             </div>
-            </div>
+        </div>
         
         <div id="chat-input-area">
             <input type="text" id="user-input" placeholder="Escribe tu mensaje...">
@@ -200,40 +223,131 @@
         </div>
     </div>
 
-    <a href="https://wa.me/XXXXXXXXXXX" id="whatsapp-fab" target="_blank" title="Hablar por WhatsApp">
+    <a href="https://wa.me/34659837581" id="whatsapp-fab" target="_blank" title="Hablar por WhatsApp">
         💬
     </a>
 
     <script>
-        // Obtener los elementos principales
+        // --- CONSTANTES Y VARIABLES ---
+        
+        // !! IMPORTANTE: Esta es la URL de tu Worker !!
+        const WORKER_URL = 'https://chat-ia-detras.chemsexcanarias.workers.dev';
+
+        // Elementos del DOM
         const welcomeModal = document.getElementById('welcome-modal');
         const chatContainer = document.getElementById('chat-container');
         const welcomeForm = document.getElementById('welcome-form');
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        // Variables para guardar los datos del usuario
+        let userName = '';
+        let userAge = '';
+
+        // --- 1. Lógica del Formulario de Bienvenida ---
         
-        // Función para cuando se envía el formulario
         welcomeForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Evita que la página se recargue
-
-            // Opcional: Guardar los datos (aunque aquí solo los usamos para empezar)
-            const nombre = document.getElementById('nombre').value;
-            const edad = document.getElementById('edad').value;
+            e.preventDefault(); 
             
-            // Ocultar el modal
+            userName = document.getElementById('nombre').value;
+            userAge = document.getElementById('edad').value;
+            
             welcomeModal.classList.add('hidden');
-            
-            // Mostrar el chat
             chatContainer.classList.remove('hidden');
-
-            // Permitir el scroll en el body ahora que el chat está visible
             document.body.style.overflow = 'auto';
         });
 
-        // --- NOTA: Próximo paso ---
-        // Aquí faltaría la lógica para:
-        // 1. Tomar el texto de 'user-input' al pulsar 'send-button'.
-        // 2. Enviarlo a un backend (servidor).
-        // 3. El backend lo enviaría a la API de Gemini.
-        // 4. Recibir la respuesta y mostrarla como un 'bot-message'.
+        // --- 2. Lógica de Envío de Mensajes ---
+        
+        // Escuchar el clic en el botón
+        sendButton.addEventListener('click', sendMessage);
+        
+        // Escuchar la tecla "Enter" en el campo de texto
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        async function sendMessage() {
+            const messageText = userInput.value.trim();
+            if (messageText === '') return; // No enviar mensajes vacíos
+
+            // 1. Mostrar el mensaje del usuario en el chat
+            addMessageToChat(messageText, 'user-message');
+            userInput.value = ''; // Limpiar el campo
+
+            // 2. Mostrar indicador de "escribiendo..."
+            showTypingIndicator();
+
+            try {
+                // 3. Enviar el mensaje al Worker (Backend)
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: messageText,
+                        nombre: userName,
+                        edad: userAge
+                    })
+                });
+
+                // Quitar el indicador de "escribiendo..."
+                hideTypingIndicator();
+
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+
+                // 4. Recibir y mostrar la respuesta de la IA
+                const data = await response.json();
+                if (data.reply) {
+                    addMessageToChat(data.reply, 'bot-message');
+                } else {
+                    throw new Error('Respuesta no válida');
+                }
+
+            } catch (error) {
+                // 5. Manejar errores
+                hideTypingIndicator();
+                addMessageToChat('Lo siento, ha ocurrido un error al conectar con el asistente. Inténtalo de nuevo más tarde.', 'bot-message');
+                console.error('Error al enviar mensaje:', error);
+            }
+        }
+
+        // --- 3. Funciones de Ayuda (Helpers) ---
+
+        /** Añade un mensaje a la ventana del chat */
+        function addMessageToChat(text, messageClass) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', messageClass);
+            messageElement.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`; // Convierte saltos de línea
+            chatMessages.appendChild(messageElement);
+            
+            // Hacer scroll hasta el final
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        /** Muestra el indicador de "escribiendo..." */
+        function showTypingIndicator() {
+            const indicator = document.createElement('div');
+            indicator.id = 'typing-indicator';
+            indicator.classList.add('message', 'bot-message', 'typing-indicator');
+            indicator.innerHTML = '<span></span><span></span><span></span>';
+            chatMessages.appendChild(indicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        /** Oculta el indicador de "escribiendo..." */
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                chatMessages.removeChild(indicator);
+            }
+        }
     </script>
 </body>
 </html>
