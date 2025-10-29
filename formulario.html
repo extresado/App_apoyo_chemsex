@@ -198,7 +198,7 @@
             width: 100%;
             margin-top: 0.5rem;
             transition: all 0.3s ease;
-            box-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue) inset;
+            box-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--color-neon) inset;
             font-family: var(--font-family);
         }
         .form-input::placeholder {
@@ -241,11 +241,25 @@
 </head>
 <body class="bg-black">
 
-    <div class="main-container">
+    <!-- Ventana Modal de Aviso -->
+    <div id="modalOverlay" class="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50" style="background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px);">
+        <div id="modalContent" class="main-container" style="background-color: rgba(10, 10, 10, 0.5); border: 2px solid var(--neon-blue); border-radius: 0.75rem; box-shadow: 0 0 20px var(--neon-blue); padding: 1.5rem;">
+            <h2 class="text-2xl font-bold text-center mb-4" style="color: var(--neon-pink);">Antes de Empezar</h2>
+            <p class="slogan text-center text-gray-200 mb-6">
+                Esta herramienta es una guía de orientación, <strong>no sustituye un diagnóstico médico profesional.</strong>
+                <br><br>
+                Usaremos IA para ayudarte a entender mejor en qué punto te encuentras, de forma anónima y confidencial.
+            </p>
+            <button id="closeModalButton" class="btn-neon btn-pink w-full">OK, ENTENDIDO</button>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal (Oculto al inicio) -->
+    <div id="mainAppContainer" class="main-container hidden">
 
         <header class="mb-8 text-center">
-            <img src="https://raw.githubusercontent.com/extresado/App_apoyo_chemsex/main/1000025194.png" alt="Logo BajadaSegura" class="logo">
-            <h1 class="text-3xl font-bold text-center mt-6 mb-2" style="color: var(--neon-pink);">
+            <!-- Logo eliminado -->
+            <h1 class="text-3xl font-bold text-center mb-2" style="color: var(--neon-pink);">
                 CHEMSEX
             </h1>
             <p class="slogan text-center text-gray-200">
@@ -388,32 +402,8 @@
             { label: "Casi siempre", value: 4 },
         ];
 
-        // Referencias del DOM
-        const questionStep = document.getElementById('questionStep');
-        const inputStep = document.getElementById('inputStep');
-        const actionStep = document.getElementById('actionStep');
-        const resultStep = document.getElementById('resultStep');
-        const questionNumber = document.getElementById('questionNumber');
-        const questionText = document.getElementById('questionText');
-        const optionsContainer = document.getElementById('optionsContainer');
-        const prevButton = document.getElementById('prevButton');
-        const nextButton = document.getElementById('nextButton');
-        const customNotesEl = document.getElementById('customNotes');
-        const userLocationEl = document.getElementById('userLocation');
-        const inputPrevButton = document.getElementById('inputPrevButton');
-        const inputNextButton = document.getElementById('inputNextButton');
-        const finalScoreText = document.getElementById('finalScoreText');
-        const reflectionButton = document.getElementById('reflectionButton');
-        const reflectionSpinner = document.getElementById('reflectionSpinner');
-        const reflectionButtonText = document.getElementById('reflectionButtonText');
-        const resourcesButton = document.getElementById('resourcesButton');
-        const resourcesSpinner = document.getElementById('resourcesSpinner');
-        const resourcesButtonText = document.getElementById('resourcesButtonText');
-        const resultTitle = document.getElementById('resultTitle');
-        const resultOutput = document.getElementById('resultOutput');
-        const resetButton = document.getElementById('resetButton');
-        const errorContainer = document.getElementById('errorContainer');
-        const errorMessage = document.getElementById('errorMessage');
+        // Referencias del DOM (se obtienen después de inicializar)
+        let questionStep, inputStep, actionStep, resultStep, questionNumber, questionText, optionsContainer, prevButton, nextButton, customNotesEl, userLocationEl, inputPrevButton, inputNextButton, finalScoreText, reflectionButton, reflectionSpinner, reflectionButtonText, resourcesButton, resourcesSpinner, resourcesButtonText, resultTitle, resultOutput, resetButton, errorContainer, errorMessage;
 
         // --- Navegación de la Aplicación ---
 
@@ -730,7 +720,37 @@
         }
 
         // --- Event Listeners y Inicialización ---
-        window.onload = () => {
+
+        // 1. Mover la lógica de inicio a su propia función
+        function initializeApp() {
+            // Obtener referencias del DOM aquí, *después* de que el modal se cierre
+            questionStep = document.getElementById('questionStep');
+            inputStep = document.getElementById('inputStep');
+            actionStep = document.getElementById('actionStep');
+            resultStep = document.getElementById('resultStep');
+            questionNumber = document.getElementById('questionNumber');
+            questionText = document.getElementById('questionText');
+            optionsContainer = document.getElementById('optionsContainer');
+            prevButton = document.getElementById('prevButton');
+            nextButton = document.getElementById('nextButton');
+            customNotesEl = document.getElementById('customNotes');
+            userLocationEl = document.getElementById('userLocation');
+            inputPrevButton = document.getElementById('inputPrevButton');
+            inputNextButton = document.getElementById('inputNextButton');
+            finalScoreText = document.getElementById('finalScoreText');
+            reflectionButton = document.getElementById('reflectionButton');
+            reflectionSpinner = document.getElementById('reflectionSpinner');
+            reflectionButtonText = document.getElementById('reflectionButtonText');
+            resourcesButton = document.getElementById('resourcesButton');
+            resourcesSpinner = document.getElementById('resourcesSpinner');
+            resourcesButtonText = document.getElementById('resourcesButtonText');
+            resultTitle = document.getElementById('resultTitle');
+            resultOutput = document.getElementById('resultOutput');
+            resetButton = document.getElementById('resetButton');
+            errorContainer = document.getElementById('errorContainer');
+            errorMessage = document.getElementById('errorMessage');
+
+            // Asignar listeners
             nextButton.addEventListener('click', nextStep);
             prevButton.addEventListener('click', prevStep);
             inputNextButton.addEventListener('click', inputStepNext);
@@ -742,7 +762,27 @@
             });
             resetButton.addEventListener('click', resetQuiz);
             
+            // Iniciar la aplicación en el primer paso
             renderStep();
+        }
+
+        // 2. window.onload ahora maneja el modal
+        window.onload = () => {
+            const modalOverlay = document.getElementById('modalOverlay');
+            const closeModalButton = document.getElementById('closeModalButton');
+            const mainAppContainer = document.getElementById('mainAppContainer');
+
+            // Mostrar el modal
+            modalOverlay.classList.remove('hidden');
+
+            // Listener para cerrar el modal
+            closeModalButton.addEventListener('click', () => {
+                modalOverlay.classList.add('hidden');
+                mainAppContainer.classList.remove('hidden');
+                
+                // Una vez cerrado, inicializar la app
+                initializeApp();
+            });
         };
 
     </script>
