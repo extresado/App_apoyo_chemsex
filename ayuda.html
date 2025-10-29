@@ -146,12 +146,28 @@
             line-height: 1.6;
             font-weight: 300;
         }
+        .resource-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed rgba(255, 51, 0, 0.3);
+        }
+        .resource-item:last-child {
+            border-bottom: none;
+        }
+        .resource-name {
+            font-weight: 700;
+            color: var(--neon-blue);
+        }
+        .resource-phone {
+            color: var(--neon-red);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="bg-black">
 
     <!-- Modal de consentimiento -->
-    <div id="consent-modal" class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm" style="z-index: 101;">
+    <div id="consent-modal" class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-sm z-[101]">
         <div class="modal-content max-w-md w-11/12 bg-[#1a1a1a] p-6 rounded-lg border-2 border-[var(--neon-red)] shadow-lg">
             <p class="content-text">
                 Estás en una situación de urgencia. Para encontrar los recursos más cercanos necesitamos tu permiso para acceder a tu ubicación.
@@ -182,15 +198,15 @@
         </div>
 
         <div id="loading-screen" class="hidden text-center">
-            <p class="content-text">Buscando recursos...</p>
+            <p class="content-text">Localizando recursos cercanos...</p>
             <div class="loader"></div>
-            <p class="content-text text-sm opacity-80">(Esto puede tardar unos segundos)</p>
+            <p class="content-text text-sm opacity-80">Esto puede tardar unos segundos</p>
         </div>
 
         <div id="results-screen" class="hidden">
             <div id="results-container">
-                <h3>Recursos Encontrados:</h3>
-                <p id="results-text"></p>
+                <h3 id="results-title">Recursos Encontrados:</h3>
+                <div id="results-text"></div>
             </div>
         </div>
 
@@ -198,88 +214,132 @@
     </div>
 
     <script>
+        // === Recursos por Comunidad Autónoma (España) ===
+        const recursosPorRegion = {
+            "Madrid": [
+                { name: "Hospital La Paz - Urgencias", phone: "91 727 70 00", type: "hospital" },
+                { name: "COGAM - Apoyo LGTBIQ+", phone: "91 522 45 22", web: "https://cogam.es", type: "lgbt" },
+                { name: "Fundación 26 de Diciembre", phone: "91 445 08 15", type: "lgbt" },
+                { name: "Línea Arcoíris (24h)", phone: "900 601 010", type: "ayuda" }
+            ],
+            "Barcelona": [
+                { name: "Hospital Clínic - Urgencias", phone: "93 227 54 00", type: "hospital" },
+                { name: "Stop Sida - Chemsex", phone: "93 318 00 06", web: "https://stopsida.org", type: "chemsex" },
+                { name: "ACATHI - LGTBIQ+ Migrantes", phone: "93 441 11 22", type: "lgbt" },
+                { name: "Teléfono de la Esperanza", phone: "93 414 48 48", type: "ayuda" }
+            ],
+            "Valencia": [
+                { name: "Hospital La Fe - Urgencias", phone: "96 124 40 00", type: "hospital" },
+                { name: "Lambda - LGTBIQ+", phone: "96 391 27 77", web: "https://lambda.cat", type: "lgbt" },
+                { name: "Apoyo Positivo - Chemsex", phone: "900 111 122", type: "chemsex" }
+            ],
+            "Andalucía": [
+                { name: "Hospital Virgen del Rocío (Sevilla)", phone: "95 501 20 00", type: "hospital" },
+                { name: "Adhara - VIH y Chemsex (Sevilla)", phone: "95 409 20 20", type: "chemsex" },
+                { name: "Teléfono de la Esperanza", phone: "900 111 112", type: "ayuda" }
+            ],
+            "default": [
+                { name: "Línea 112 - Emergencias Nacional", phone: "112", type: "urgencia" },
+                { name: "Teléfono de la Esperanza (24h)", phone: "717 003 717", type: "ayuda" },
+                { name: "Apoyo Positivo - Chemsex", phone: "900 111 122", web: "https://apoyopositivo.org", type: "chemsex" },
+                { name: "Stop Sida - Chemsex", phone: "93 318 00 06", web: "https://stopsida.org", type: "chemsex" },
+                { name: "Línea Arcoíris LGTBIQ+ (24h)", phone: "900 601 010", type: "lgbt" }
+            ]
+        };
+
+        // === Elementos del DOM ===
         const consentModal = document.getElementById('consent-modal');
         const modalOkButton = document.getElementById('modal-ok-button');
         const consentScreen = document.getElementById('consent-screen');
         const loadingScreen = document.getElementById('loading-screen');
         const resultsScreen = document.getElementById('results-screen');
         const resultsText = document.getElementById('results-text');
+        const resultsTitle = document.getElementById('results-title');
 
-        modalOkButton.addEventListener('click', () => {
-            consentModal.style.display = 'none';
-            consentScreen.classList.add('visible');
-        });
-
-        const acceptButton = document.getElementById('consent-accept');
-        const denyButton = document.getElementById('consent-deny');
-        acceptButton.addEventListener('click', handleAccept);
-        denyButton.addEventListener('click', handleDeny);
-
-        const apiKey = "AIzaSyAdE1IgXbIuOq6mLTJGSxKUqPRJjB57I-M"; 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
+        // === Mostrar pantallas ===
         function showScreen(screen) {
-            loadingScreen.classList.add('hidden');
-            resultsScreen.classList.add('hidden');
-            consentScreen.style.opacity = 0;
-            consentScreen.style.pointerEvents = 'none';
+            [consentScreen, loadingScreen, resultsScreen].forEach(s => s.classList.add('hidden'));
+            if (screen === 'consent') consentScreen.classList.remove('hidden');
             if (screen === 'loading') loadingScreen.classList.remove('hidden');
             if (screen === 'results') resultsScreen.classList.remove('hidden');
         }
 
-        function handleAccept() {
-            showScreen('loading');
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
-            } else { locationError(); }
+        // === Renderizar recursos ===
+        function renderResources(resources, location = null) {
+            let html = location ? `<p class="mb-3"><strong>Ubicación detectada:</strong> ${location}</p>` : '';
+            resources.forEach(r => {
+                const webLink = r.web ? ` <a href="${r.web}" target="_blank" class="text-cyan-400 underline text-sm">web</a>` : '';
+                html += `
+                <div class="resource-item">
+                    <div class="resource-name">${r.name}</div>
+                    <div class="resource-phone">📞 <a href="tel:${r.phone}">${r.phone}</a>${webLink}</div>
+                </div>`;
+            });
+            resultsText.innerHTML = html;
         }
 
-        function handleDeny() {
-            showScreen('loading');
-            fetchResources(null);
-        }
-
-        function locationSuccess(position) {
-            const { latitude, longitude } = position.coords;
-            fetchResources({ lat: latitude, lon: longitude });
-        }
-
-        function locationError() {
-            console.warn("Error de geolocalización. Buscando recursos generales.");
-            fetchResources(null);
-        }
-
-        async function fetchResources(location) {
-            const systemPrompt = "Eres un asistente de apoyo en crisis de chemsex. Tu función es listar recursos de ayuda (hospitales, ONGs, líneas de ayuda). Prioriza recursos LGTBIQ+ y especializados en salud sexual. No des consejos médicos.";
-            let userQuery = location
-                ? `Encuentra recursos de ayuda urgente cerca de la latitud ${location.lat} y longitud ${location.lon}.`
-                : "Lista recursos telefónicos u online para crisis de chemsex en España (ONGs, hospitales, líneas de ayuda).";
-            const payload = { contents: [{ parts: [{ text: `${systemPrompt}\n\n${userQuery}` }] }] };
-
+        // === Obtener ciudad desde coordenadas (Nominatim) ===
+        async function getCityFromCoords(lat, lon) {
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error(`Error ${response.status}`);
-                const result = await response.json();
-                const candidate = result.candidates?.[0]?.content?.parts?.[0]?.text || "No se encontraron recursos.";
-                displayResults(candidate);
-            } catch (error) {
-                console.error("Error al buscar recursos:", error);
-                displayResults("⚠️ No se pudieron cargar los recursos. Intenta nuevamente o llama al 112.");
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
+                const data = await res.json();
+                const city = data.address?.city || data.address?.town || data.address?.state || "España";
+                return city;
+            } catch (e) {
+                return "España";
             }
         }
 
-        function displayResults(text) {
-            resultsText.innerText = text;
+        // === Buscar recursos cercanos ===
+        async function fetchNearbyResources() {
+            showScreen('loading');
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    async pos => {
+                        const { latitude, longitude } = pos.coords;
+                        const city = await getCityFromCoords(latitude, longitude);
+                        const regionKey = city.includes("Madrid") ? "Madrid" :
+                                        city.includes("Barcelona") ? "Barcelona" :
+                                        city.includes("Valencia") ? "Valencia" :
+                                        city.includes("Sevilla") || city.includes("Málaga") ? "Andalucía" : "default";
+
+                        const resources = recursosPorRegion[regionKey] || recursosPorRegion["default"];
+                        resultsTitle.textContent = `Recursos en ${city}`;
+                        renderResources(resources, city);
+                        showScreen('results');
+                    },
+                    () => {
+                        showGeneralResources();
+                    },
+                    { timeout: 10000 }
+                );
+            } else {
+                showGeneralResources();
+            }
+        }
+
+        // === Recursos generales ===
+        function showGeneralResources() {
+            resultsTitle.textContent = "Recursos Nacionales (España)";
+            renderResources(recursosPorRegion["default"]);
             showScreen('results');
         }
 
+        // === Eventos ===
+        modalOkButton.addEventListener('click', () => {
+            consentModal.style.display = 'none';
+            consentScreen.style.opacity = '1';
+            consentScreen.style.pointerEvents = 'auto';
+        });
+
+        document.getElementById('consent-accept').addEventListener('click', fetchNearbyResources);
+        document.getElementById('consent-deny').addEventListener('click', showGeneralResources);
+
+        // === Inicialización ===
         document.addEventListener('DOMContentLoaded', () => {
             consentScreen.style.opacity = '0';
             consentScreen.style.pointerEvents = 'none';
+            consentScreen.style.transition = 'opacity 0.3s ease';
         });
     </script>
 </body>
