@@ -231,7 +231,7 @@
         // --- CONSTANTES Y VARIABLES ---
         
         // !! IMPORTANTE: Esta es la URL de tu Worker !!
-        const WORKER_URL = 'https://chat-ia-detras.chemsexcanarias.workers.dev';
+        const WORKER_URL = 'https://ia-tras-chat.chemsexcanarias.workers.dev';
 
         // Elementos del DOM
         const welcomeModal = document.getElementById('welcome-modal');
@@ -307,13 +307,18 @@
                 if (data.reply) {
                     addMessageToChat(data.reply, 'bot-message');
                 } else {
-                    throw new Error('Respuesta no válida');
+                    // Si el Worker devuelve un error de configuración u otro problema conocido:
+                    if (data.error) {
+                        addMessageToChat(data.error, 'bot-message');
+                    } else {
+                        throw new Error('Respuesta no válida del Worker');
+                    }
                 }
 
             } catch (error) {
-                // 5. Manejar errores
+                // 5. Manejar errores de conexión o fetch fallido
                 hideTypingIndicator();
-                addMessageToChat('Lo siento, ha ocurrido un error al conectar con el asistente. Inténtalo de nuevo más tarde.', 'bot-message');
+                addMessageToChat('Lo siento, ha ocurrido un error de conexión al backend. Inténtalo de nuevo más tarde o verifica la URL de tu Worker.', 'bot-message');
                 console.error('Error al enviar mensaje:', error);
             }
         }
