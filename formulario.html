@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evaluación Chemsex - @BajadaSegura</title>
     
-    <!-- Carga de Tailwind CSS (sigue siendo útil para el layout) -->
+    <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Fuente Montserrat (de index.html) -->
+    <!-- Fuente Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
@@ -34,7 +34,7 @@
             font-family: var(--font-family);
             min-height: 100vh;
             padding-top: 5vh;
-            padding-bottom: 5vh; /* Añadido para que haya scroll */
+            padding-bottom: 5vh;
             box-sizing: border-box;
             position: relative;
         }
@@ -53,7 +53,7 @@
             z-index: 100;
         }
 
-        /* Contenedor principal (de index.html) */
+        /* Contenedor principal */
         .main-container {
             width: 100%;
             max-width: 450px;
@@ -63,7 +63,7 @@
             z-index: 1;
         }
         
-        /* Logo (de index.html) */
+        /* Logo */
         .logo {
             width: 100px;
             height: 100px;
@@ -72,19 +72,19 @@
                     drop-shadow(0 0 16px rgba(255, 255, 255, 0.7));
         }
 
-        /* Slogan (de index.html) */
+        /* Slogan */
         .slogan {
             font-weight: 300;
             font-size: 1.125rem;
             line-height: 1.6;
         }
 
-        /* Botón Neón Base (de index.html) */
+        /* Botón Neón Base */
         .btn-neon {
-            display: inline-block; /* Cambiado para botones de nav */
-            width: 100%; /* Por defecto full-width */
+            display: inline-block;
+            width: 100%;
             padding: 1.25rem;
-            margin-bottom: 1rem; /* Reducido de 1.5rem */
+            margin-bottom: 1rem;
             border: 2px solid var(--color-neon);
             color: var(--color-neon);
             background-color: rgba(10, 10, 10, 0.3);
@@ -97,6 +97,7 @@
             cursor: pointer;
             backdrop-filter: blur(2px);
             box-shadow: 0 0 5px var(--color-neon), 0 0 10px var(--color-neon) inset;
+            text-decoration: none; /* Para los tags <a> */
         }
 
         .btn-neon:hover {
@@ -105,7 +106,7 @@
             box-shadow: 0 0 15px var(--color-neon), 0 0 30px var(--color-neon);
         }
         
-        .btn-neon:disabled { /* Estilo para botones deshabilitados */
+        .btn-neon:disabled {
             --color-neon: #555;
             color: #555;
             border-color: #555;
@@ -120,7 +121,7 @@
         .btn-blue { --color-neon: var(--neon-blue); }
         .btn-purple { --color-neon: var(--neon-purple); }
 
-        /* Animación Pulso (de index.html) */
+        /* Animación Pulso */
         .btn-red {
             animation: pulse-red 2s infinite ease-in-out;
         }
@@ -135,7 +136,6 @@
          * ==========================================
         */
 
-        /* Texto de las preguntas */
         .question-number {
             font-size: 0.9rem;
             font-weight: 700;
@@ -145,7 +145,7 @@
             text-align: center;
         }
         .question-text {
-            font-size: 1.25rem; /* 20px */
+            font-size: 1.25rem;
             font-weight: 400;
             line-height: 1.6;
             margin-bottom: 1.5rem;
@@ -157,7 +157,7 @@
         .radio-label-neon {
             display: block;
             width: 100%;
-            padding: 1rem; /* Más pequeñas que botones de nav */
+            padding: 1rem;
             margin-bottom: 0.75rem;
             border: 2px solid var(--color-neon);
             color: var(--color-neon);
@@ -169,7 +169,7 @@
             cursor: pointer;
             backdrop-filter: blur(2px);
             box-shadow: 0 0 5px var(--color-neon), 0 0 10px var(--color-neon) inset;
-            --color-neon: var(--neon-blue); /* Color por defecto (no seleccionada) */
+            --color-neon: var(--neon-blue); /* Color por defecto */
         }
 
         input[type="radio"]:checked + .radio-label-neon {
@@ -215,7 +215,7 @@
         /* Estilos para el spinner */
         .spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid var(--neon-pink); /* Color neón */
+            border-top: 4px solid var(--neon-pink);
             border-radius: 50%;
             width: 24px;
             height: 24px;
@@ -241,14 +241,10 @@
 </head>
 <body class="bg-black">
 
-    <!-- Contenedor Principal (de index.html) -->
     <div class="main-container">
 
-        <!-- Encabezado del Formulario (Estilo Neón) -->
         <header class="mb-8 text-center">
-            <!-- Usamos la URL absoluta del logo que ya teníamos -->
             <img src="https://raw.githubusercontent.com/extresado/App_apoyo_chemsex/main/1000025194.png" alt="Logo BajadaSegura" class="logo">
-            
             <h1 class="text-3xl font-bold text-center mt-6 mb-2" style="color: var(--neon-pink);">
                 CHEMSEX
             </h1>
@@ -257,22 +253,17 @@
             </p>
         </header>
 
-        <!-- Contenedor principal de los pasos (sin .radical-card) -->
         <div id="quizContent">
             
             <!-- 1. Paso de Pregunta -->
             <div id="questionStep" class="hidden space-y-4">
-                <!-- Estructura de pregunta simplificada -->
                 <div>
                     <p id="questionNumber" class="question-number"></p>
                     <p id="questionText" class="question-text"></p>
                 </div>
-
                 <div id="optionsContainer" class="space-y-1">
-                    <!-- Opciones de radio inyectadas aquí (JS modificado) -->
+                    <!-- Opciones de radio inyectadas aquí -->
                 </div>
-
-                <!-- Botones de navegación (pequeños) -->
                 <div class="flex justify-between pt-4">
                     <button id="prevButton" class="btn-neon btn-blue py-2 px-6 text-sm" style="width: auto;" disabled>
                         &larr; Anterior
@@ -287,21 +278,16 @@
             <div id="inputStep" class="hidden space-y-6">
                 <div>
                     <p class="question-text mb-4">Información Adicional</p>
-
-                    <!-- Input de Ubicación (MANDATORIO) -->
                     <div>
                         <label for="userLocation" class="form-label">¿En qué ciudad o región te encuentras? (Obligatorio)</label>
                         <input type="text" id="userLocation" required placeholder="Ej: Madrid, Barcelona..." class="form-input">
                     </div>
-
-                    <!-- Notas Personalizadas (Opcional) -->
                     <div class="mt-4">
                         <label for="customNotes" class="form-label">¿Quieres añadir algo más?</label>
                         <p class="text-gray-400 text-xs mb-2 font-light">Cualquier contexto es valioso para evaluar en qué situación estás.</p>
                         <textarea id="customNotes" rows="4" class="form-input"></textarea>
                     </div>
                 </div>
-                
                 <div class="flex justify-between pt-4">
                     <button id="inputPrevButton" class="btn-neon btn-blue py-2 px-6 text-sm" style="width: auto;">
                         &larr; Anterior
@@ -312,7 +298,6 @@
                 </div>
             </div>
 
-
             <!-- 3. Paso Final de Acciones -->
             <div id="actionStep" class="hidden text-center space-y-4">
                 <div>
@@ -320,12 +305,9 @@
                     <p class="text-gray-300 font-light">Gracias por tu honestidad. Has dado un gran paso. ¿Qué camino eliges ahora?</p>
                     <p id="finalScoreText" class="text-lg font-bold mt-3" style="color: var(--neon-pink);"></p>
                 </div>
-
-                <!-- Botón de Emergencia (Destacado) -->
                 <button id="emergencyButton" class="btn-neon btn-red w-full" onclick="handleEmergency()">
                     LLAMAR AL 112 (Emergencia)
                 </button>
-
                 <div class="flex flex-col space-y-4">
                     <button id="reflectionButton" class="btn-neon btn-pink w-full flex items-center justify-center">
                         <span id="reflectionButtonText">Reflexión + Recursos (LGTBIQ+)</span>
@@ -340,7 +322,6 @@
 
             <!-- 4. Paso de Resultados -->
             <div id="resultStep" class="hidden">
-                <!-- Contenedor de resultados (sin fondo) -->
                 <div>
                     <h2 id="resultTitle" class="question-text text-blue-400 mb-4 text-center"></h2>
                     <div id="resultOutput" class="markdown-output min-h-[100px]">
@@ -355,6 +336,11 @@
                 <button id="resetButton" class="btn-neon btn-blue w-full mt-4">
                     Reiniciar el Cuestionario
                 </button>
+
+                <!-- Botón "Volver al Inicio" añadido -->
+                <a href="index.html" class="btn-neon btn-purple w-full mt-4" style="margin-bottom: 0;">
+                    Volver al Inicio
+                </a>
             </div>
 
             <!-- Área de mensaje de error -->
@@ -365,7 +351,7 @@
     </div>
 
     <script>
-        // AVISO CRÍTICO DE SEGURIDAD (Sin cambios)
+        // API Key
         const apiKey = "AIzaSyAdE1IgXbIuOq6mLTJGSxKUqPRJjB57I-M"; 
         
         const API_URL_BASE = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
@@ -374,14 +360,14 @@
         const PARTNER_NAME = "@BajadaSegura";
         const EMERGENCY_NUMBER = "112";
 
-        // Estado de la aplicación (Sin cambios)
+        // Estado de la aplicación
         let currentStep = 0;
         const scores = Array(10).fill(null);
         let totalScore = 0;
         let customNotes = "";
         let userLocation = "";
 
-        // Datos de preguntas (Sin cambios)
+        // Datos de preguntas
         const questionsData = [
             { text: "¿Con qué frecuencia consumes drogas específicamente para tener o prolongar encuentros sexuales?", name: "q1" },
             { text: "¿Has intentado reducir o controlar el uso de drogas para el sexo sin conseguirlo?", name: "q2" },
@@ -402,7 +388,7 @@
             { label: "Casi siempre", value: 4 },
         ];
 
-        // Referencias del DOM (Sin cambios en los IDs)
+        // Referencias del DOM
         const questionStep = document.getElementById('questionStep');
         const inputStep = document.getElementById('inputStep');
         const actionStep = document.getElementById('actionStep');
@@ -451,14 +437,11 @@
 
         function renderStep() {
             if (currentStep < questionsData.length) {
-                // Paso de preguntas
                 showStep('question');
                 const q = questionsData[currentStep];
                 questionNumber.textContent = `Pregunta ${currentStep + 1} de ${questionsData.length}`;
                 questionText.textContent = q.text;
 
-                // === MODIFICACIÓN CLAVE ===
-                // Usamos la nueva clase CSS 'radio-label-neon'
                 optionsContainer.innerHTML = options.map(option => `
                     <label class="flex items-center">
                         <input type="radio" name="${q.name}" value="${option.value}" class="hidden" 
@@ -468,7 +451,6 @@
                         </span>
                     </label>
                 `).join('');
-                // === FIN DE MODIFICACIÓN ===
 
                 prevButton.disabled = currentStep === 0;
                 
@@ -476,31 +458,23 @@
                     input.addEventListener('change', () => {
                         scores[currentStep] = input.value;
                         nextButton.disabled = false;
-                        
-                        // Opcional: auto-siguiente en móvil para fluidez
-                        // setTimeout(() => nextStep(), 200);
                     });
                 });
                 
                 nextButton.disabled = scores[currentStep] === null;
 
             } else if (currentStep === questionsData.length) {
-                // Paso de input personalizado
                 showStep('input');
                 customNotesEl.value = customNotes;
                 userLocationEl.value = userLocation;
             }
             else {
-                // Paso de acciones
                 totalScore = scores.reduce((sum, score) => sum + (parseInt(score) || 0), 0);
                 finalScoreText.textContent = `Puntuación Total: ${totalScore} de 40 puntos.`;
                 showStep('action');
             }
         }
 
-        // Resto del JS (nextStep, inputStepNext, etc.) no necesita cambios
-        // en su lógica, solo en los estilos que ya hemos aplicado.
-        
         function nextStep() {
             if (currentStep < questionsData.length) {
                 const checked = document.querySelector(`input[name="${questionsData[currentStep].name}"]:checked`);
@@ -557,7 +531,6 @@
         }
         
         function handleEmergency() {
-            // Mensaje de emergencia adaptado al estilo neón
             resultOutput.innerHTML = `
                 <div class="p-4 rounded-lg" style="border: 2px solid var(--neon-red); background-color: rgba(255, 51, 0, 0.1);">
                     <h2 class="text-white text-xl font-bold mb-2" style="color: var(--neon-red);">ATENCIÓN: LLAMADA DE EMERGENCIA</h2>
@@ -570,7 +543,7 @@
             showStep('result');
         }
 
-        // --- Llamadas a la API y Lógica de Evaluación (Sin cambios) ---
+        // --- Llamadas a la API y Lógica de Evaluación ---
 
         async function retryFetchWithBackoff(url, options, retries = MAX_RETRIES) {
             for (let i = 0; i < retries; i++) {
@@ -645,7 +618,8 @@
 
             } catch (error) {
                 console.error("Error en la evaluación de Gemini:", error);
-                resultOutput.innerHTML = `<p style="color:var(--neon-red);" class="font-bold">Error en la Reflexión:</p><p>Lo siento, hubo un problema al contactar con la IA. Por favor, intenta la opción de Recursos Directos.</p>`;
+                resultOutput.innerHTML = '<p style="color:var(--neon-red);" class="font-bold">Error en la Reflexión:</p><p>' + error.message + '</p><p>Por favor, intenta la opción de Recursos Directos.</p>';
+                
                 reflectionButton.disabled = false;
                 resourcesButton.disabled = false;
                 reflectionButtonText.textContent = "Reflexión + Recursos (LGTBIQ+)";
@@ -707,7 +681,8 @@
             } catch (error) {
                 console.error("Error en la búsqueda de recursos:", error);
                 
-                const errorHtml = `<p style="color:var(--neon-red);" class="font-bold">Error en la Búsqueda de Recursos:</p><p>Lo siento, hubo un problema al contactar con Google Search. No se pudieron encontrar recursos. Intenta reiniciar.</p>`;
+                const errorHtml = '<p style="color:var(--neon-red);" class="font-bold">Error en la Búsqueda de Recursos:</p><p>' + error.message + '</p><p>No se pudieron encontrar recursos. Intenta reiniciar.</p>';
+                
                 if (isReflectionCombined) {
                     resultOutput.innerHTML += errorHtml;
                 } else {
@@ -725,7 +700,6 @@
 
         // --- Utilidades de Markdown y Error ---
         
-        // Función 'marked' simplificada (sin cambios)
         function marked(markdown) {
             let html = markdown
                 .replace(/^# (.*$)/gim, '<h1>$1</h1>')
@@ -736,7 +710,7 @@
                 .replace(/\n\n/gim, '</p><p>')
                 .replace(/(^<p>|<\/p>$)/g, ''); 
             html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-            if (!html.startsWith('<h') && !html.stargitsWith('<li') && !html.startsWith('<a')) {
+            if (!html.startsWith('<h') && !html.startsWith('<li') && !html.startsWith('<a')) {
                 html = `<p>${html}</p>`;
             }
             html = html.replace(/((?:<li>.*?<\/li>\s*)+)/gs, '<ul>$1</ul>');
@@ -774,4 +748,5 @@
     </script>
 </body>
 </html>
+
 
