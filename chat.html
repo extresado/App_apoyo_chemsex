@@ -117,6 +117,7 @@
             background: linear-gradient(180deg, #0f0c29, #16213e);
             opacity: 0;
             transition: opacity 0.4s ease;
+            padding-bottom: env(safe-area-inset-bottom); /* Ajuste para barras de navegación */
         }
 
         #chat-container.visible {
@@ -206,6 +207,7 @@
             background: #0f172a;
             border-top: 1px solid #1e293b;
             gap: 0.75rem;
+            padding-bottom: calc(1rem + env(safe-area-inset-bottom)); /* Sube la caja de entrada */
         }
 
         #user-input {
@@ -246,7 +248,7 @@
         /* --- 3. Botón Flotante WhatsApp --- */
         #whatsapp-fab {
             position: fixed;
-            bottom: 20px;
+            bottom: calc(80px + env(safe-area-inset-bottom)); /* Sube el botón de WhatsApp */
             right: 20px;
             width: 60px;
             height: 60px;
