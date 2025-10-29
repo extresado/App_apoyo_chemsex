@@ -171,6 +171,7 @@
             white-space: pre-wrap; /* Mantiene saltos de línea de Gemini */
             line-height: 1.6;
             font-weight: 300;
+            word-wrap: break-word; /* Asegura que el texto de error no se salga */
         }
 
         #results-sources {
@@ -310,12 +311,17 @@
         }
 
         function showScreen(screen) {
-            consentScreen.classList.add('hidden');
+            // Ocultar consent-screen (ahora solo los botones)
+            document.getElementById('consent-screen').style.opacity = 0;
+            document.getElementById('consent-screen').style.pointerEvents = 'none';
+            
             loadingScreen.classList.add('hidden');
             resultsScreen.classList.add('hidden');
 
             if (screen === 'consent') {
-                consentScreen.classList.remove('hidden');
+                // Esta lógica ahora la controla el modal
+                document.getElementById('consent-screen').style.opacity = 1;
+                document.getElementById('consent-screen').style.pointerEvents = 'auto';
             } else if (screen === 'loading') {
                 loadingScreen.classList.remove('hidden');
             } else if (screen === 'results') {
@@ -346,14 +352,30 @@
             };
 
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                // Implementación de reintentos con backoff exponencial
+                let response;
+                let retries = 5;
+                let delay = 1000;
+                for (let i = 0; i < retries; i++) {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429 || response.status >= 500) {
+                        console.warn(`Intento ${i + 1} fallido con estado ${response.status}. Reintentando en ${delay}ms...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    } else {
+                        break; // Éxito o error no recuperable
+                    }
+                }
 
                 if (!response.ok) {
-                    throw new Error(`Error de API: ${response.statusText}`);
+                    const errorResult = await response.json();
+                    const errorDetail = errorResult.error?.message || response.statusText;
+                    throw new Error(`Error de API: ${errorDetail}`);
                 }
 
                 const result = await response.json();
@@ -380,7 +402,8 @@
 
             } catch (error) {
                 console.error("Error al llamar a Gemini:", error);
-                displayResults("No se pudieron cargar los recursos en este momento. Por favor, intenta de nuevo o llama al 112 si es una emergencia grave.", []);
+                // MODIFICACIÓN: Mostrar el error real al usuario
+                displayResults("Error al buscar recursos: " + error.message + ". Por favor, intenta de nuevo o llama al 112 si es una emergencia grave.", []);
             }
         }
 
@@ -390,7 +413,7 @@
          * @param {Array} sources - Array de objetos {uri, title}.
          */
         function displayResults(text, sources) {
-            resultsText.innerText = text; // innerText para evitar inyección XSS (aunque 'text' es más seguro)
+            resultsText.innerText = text;
             
             if (sources.length > 0) {
                 const sourcesHtml = sources
@@ -403,11 +426,41 @@
             
             showScreen('results');
         }
+        
+        // Corrección en showScreen para que funcione bien con el modal
+        function showScreen(screen) {
+            const consentScreenDiv = document.getElementById('consent-screen');
+            
+            // Ocultar todas las pantallas principales
+            loadingScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            
+            // Ocultar los botones de consentimiento
+            if (screen !== 'consent') {
+                 consentScreenDiv.style.opacity = '0';
+                 consentScreenDiv.style.pointerEvents = 'none';
+            }
+
+            if (screen === 'loading') {
+                loadingScreen.classList.remove('hidden');
+            } else if (screen === 'results') {
+                resultsScreen.classList.remove('hidden');
+            } else if (screen === 'consent') {
+                // Esta pantalla ya es visible por defecto después del modal
+                consentScreenDiv.style.opacity = '1';
+                consentScreenDiv.style.pointerEvents = 'auto';
+            }
+        }
+
+        // Asegurarse de que los botones de consentimiento no sean visibles al cargar
+        // Se harán visibles al cerrar el modal
+        document.addEventListener('DOMContentLoaded', () => {
+             document.getElementById('consent-screen').style.opacity = '0';
+             document.getElementById('consent-screen').style.pointerEvents = 'none';
+        });
 
     </script>
 </body>
 </html>
-
-
 
 
