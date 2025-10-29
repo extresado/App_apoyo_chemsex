@@ -250,216 +250,107 @@
     </div>
 
     <script>
-        // Referencias a elementos del DOM
-        const consentScreen = document.getElementById('consent-screen');
-        const loadingScreen = document.getElementById('loading-screen');
-        const resultsScreen = document.getElementById('results-screen');
+    const consentModal = document.getElementById('consent-modal');
+    const modalOkButton = document.getElementById('modal-ok-button');
+    const consentScreen = document.getElementById('consent-screen');
+    const loadingScreen = document.getElementById('loading-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const resultsText = document.getElementById('results-text');
+    const resultsSources = document.getElementById('results-sources');
+
+    modalOkButton.addEventListener('click', () => {
+        consentModal.style.display = 'none';
+        consentScreen.classList.add('visible');
+    });
+
+    const acceptButton = document.getElementById('consent-accept');
+    const denyButton = document.getElementById('consent-deny');
+    acceptButton.addEventListener('click', handleAccept);
+    denyButton.addEventListener('click', handleDeny);
+
+    const apiKey = "AIzaSyAdE1IgXbIuOq6mLTJGSxKUqPRJjB57I-M"; 
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+    function showScreen(screen) {
+        loadingScreen.classList.add('hidden');
+        resultsScreen.classList.add('hidden');
+        consentScreen.style.opacity = 0;
+        consentScreen.style.pointerEvents = 'none';
+
+        if (screen === 'loading') loadingScreen.classList.remove('hidden');
+        if (screen === 'results') resultsScreen.classList.remove('hidden');
+    }
+
+    function handleAccept() {
+        showScreen('loading');
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
+        } else {
+            locationError();
+        }
+    }
+
+    function handleDeny() {
+        showScreen('loading');
+        fetchResources(null);
+    }
+
+    function locationSuccess(position) {
+        const { latitude, longitude } = position.coords;
+        fetchResources({ lat: latitude, lon: longitude });
+    }
+
+    function locationError() {
+        console.warn("Error de geolocalización. Buscando recursos generales.");
+        fetchResources(null);
+    }
+
+    async function fetchResources(location) {
+        const systemPrompt = "Eres un asistente de apoyo en crisis de chemsex. Tu función es listar recursos de ayuda (hospitales, ONGs, líneas de ayuda). Prioriza recursos LGTBIQ+ y especializados en salud sexual. No des consejos médicos.";
         
-        const acceptButton = document.getElementById('consent-accept');
-        const denyButton = document.getElementById('consent-deny');
-        
-        const resultsText = document.getElementById('results-text');
-        const resultsSources = document.getElementById('results-sources');
-
-        // --- NUEVAS REFERENCIAS Y LÓGICA DE MODAL ---
-        const consentModal = document.getElementById('consent-modal');
-        const modalOkButton = document.getElementById('modal-ok-button');
-
-        // Mostrar botones solo después de aceptar el modal
-        modalOkButton.addEventListener('click', () => {
-            consentModal.style.display = 'none'; // Ocultar modal
-            consentScreen.classList.add('visible'); // Mostrar botones con fade-in
-        });
-        // --- FIN LÓGICA DE MODAL ---
-
-        // Configuración de la API
-        // CLAVE API EXTRAÍDA DE formulario.html
-        const apiKey = "AIzaSyAdE1IgXbIuOq6mLTJGSxKUqPRJjB57I-M"; 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-        // Event Listeners
-        acceptButton.addEventListener('click', handleAccept);
-        denyButton.addEventListener('click', handleDeny);
-
-        function handleAccept() {
-            showScreen('loading');
-            
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
-            } else {
-                // Geolocation no soportada
-                locationError();
-            }
+        let userQuery;
+        if (location) {
+            userQuery = `Encuentra recursos de ayuda urgente (hospitales, ONGs, centros de salud sexual) cerca de la latitud ${location.lat} y longitud ${location.lon}.`;
+        } else {
+            userQuery = "Lista los principales recursos telefónicos u online para crisis de chemsex en España (ONGs, líneas de ayuda, hospitales) que sean LGTBIQ+ friendly.";
         }
 
-        function handleDeny() {
-            showScreen('loading');
-            // Llama a fetchResources sin ubicación (fallback)
-            fetchResources(null);
+        const payload = {
+            contents: [
+                { parts: [{ text: `${systemPrompt}\n\n${userQuery}` }] }
+            ]
+        };
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`Error ${response.status}`);
+
+            const result = await response.json();
+            const candidate = result.candidates?.[0]?.content?.parts?.[0]?.text || "No se encontraron recursos.";
+            displayResults(candidate);
+
+        } catch (error) {
+            console.error("Error al buscar recursos:", error);
+            displayResults("⚠️ No se pudieron cargar los recursos. Intenta nuevamente o llama al 112 en caso de emergencia.");
         }
+    }
 
-        function locationSuccess(position) {
-            const { latitude, longitude } = position.coords;
-            // Llama a fetchResources con ubicación
-            fetchResources({ lat: latitude, lon: longitude });
-        }
+    function displayResults(text) {
+        resultsText.innerText = text;
+        resultsSources.innerHTML = "";
+        showScreen('results');
+    }
 
-        function locationError() {
-            // Si falla la geolocalización, llama sin ubicación
-            console.warn("Error de geolocalización o no soportada. Buscando recursos generales.");
-            fetchResources(null);
-        }
-
-        function showScreen(screen) {
-            // Ocultar consent-screen (ahora solo los botones)
-            document.getElementById('consent-screen').style.opacity = 0;
-            document.getElementById('consent-screen').style.pointerEvents = 'none';
-            
-            loadingScreen.classList.add('hidden');
-            resultsScreen.classList.add('hidden');
-
-            if (screen === 'consent') {
-                // Esta lógica ahora la controla el modal
-                document.getElementById('consent-screen').style.opacity = 1;
-                document.getElementById('consent-screen').style.pointerEvents = 'auto';
-            } else if (screen === 'loading') {
-                loadingScreen.classList.remove('hidden');
-            } else if (screen === 'results') {
-                resultsScreen.classList.remove('hidden');
-            }
-        }
-
-        /**
-         * Llama a la API de Gemini para buscar recursos.
-         * @param {Object | null} location - Objeto con {lat, lon} o null.
-         */
-        async function fetchResources(location) {
-            const systemPrompt = "Eres un asistente de apoyo en crisis de chemsex. Tu única función es encontrar recursos de ayuda (hospitales, ONGs, líneas de ayuda). Prioriza recursos amigables con LGTBIQ+ y especializados en chemsex o salud sexual. NO DES CONSEJOS MÉDICOS. Solo lista los recursos con nombre, dirección y teléfono si es posible. Responde en español.";
-            
-            let userQuery;
-            if (location) {
-                userQuery = `Encuentra recursos de ayuda urgente (hospitales, ONGs, centros de salud sexual) cerca de la latitud ${location.lat} y longitud ${location.lon}. Prioriza los que sean LGTBIQ+ friendly y tengan experiencia en chemsex.`;
-            } else {
-                userQuery = "El usuario no ha proporcionado ubicación. Lista los principales recursos de apoyo telefónico u online para crisis de chemsex en España (ej. líneas de ayuda, ONGs nacionales) que sean LGTBIQ+ friendly.";
-            }
-
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                tools: [{ "google_search": {} }], // Usamos Google Search
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
-            };
-
-            try {
-                // Implementación de reintentos con backoff exponencial
-                let response;
-                let retries = 5;
-                let delay = 1000;
-                for (let i = 0; i < retries; i++) {
-                    response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.status === 429 || response.status >= 500) {
-                        console.warn(`Intento ${i + 1} fallido con estado ${response.status}. Reintentando en ${delay}ms...`);
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2;
-                    } else {
-                        break; // Éxito o error no recuperable
-                    }
-                }
-
-                if (!response.ok) {
-                    const errorResult = await response.json();
-                    const errorDetail = errorResult.error?.message || response.statusText;
-                    throw new Error(`Error de API: ${errorDetail}`);
-                }
-
-                const result = await response.json();
-                
-                const candidate = result.candidates?.[0];
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    const text = candidate.content.parts[0].text;
-                    let sources = [];
-                    const groundingMetadata = candidate.groundingMetadata;
-                    
-                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
-                        sources = groundingMetadata.groundingAttributions
-                            .map(attr => ({
-                                uri: attr.web?.uri,
-                                title: attr.web?.title,
-                            }))
-                            .filter(source => source.uri && source.title);
-                    }
-                    
-                    displayResults(text, sources);
-                } else {
-                    throw new Error("Respuesta de API inesperada o vacía.");
-                }
-
-            } catch (error) {
-                console.error("Error al llamar a Gemini:", error);
-                // MODIFICACIÓN: Mostrar el error real al usuario
-                displayResults("Error al buscar recursos: " + error.message + ". Por favor, intenta de nuevo o llama al 112 si es una emergencia grave.", []);
-            }
-        }
-
-        /**
-         * Muestra los resultados en la pantalla.
-         * @param {string} text - El texto generado por la IA.
-         * @param {Array} sources - Array de objetos {uri, title}.
-         */
-        function displayResults(text, sources) {
-            resultsText.innerText = text;
-            
-            if (sources.length > 0) {
-                const sourcesHtml = sources
-                    .map(src => `<li><a href="${src.uri}" target="_blank" rel="noopener noreferrer">${src.title}</a></li>`)
-                    .join('');
-                resultsSources.innerHTML = `<strong>Fuentes (verificado por Google):</strong><ul>${sourcesHtml}</ul>`;
-            } else {
-                resultsSources.innerHTML = "";
-            }
-            
-            showScreen('results');
-        }
-        
-        // Corrección en showScreen para que funcione bien con el modal
-        function showScreen(screen) {
-            const consentScreenDiv = document.getElementById('consent-screen');
-            
-            // Ocultar todas las pantallas principales
-            loadingScreen.classList.add('hidden');
-            resultsScreen.classList.add('hidden');
-            
-            // Ocultar los botones de consentimiento
-            if (screen !== 'consent') {
-                 consentScreenDiv.style.opacity = '0';
-                 consentScreenDiv.style.pointerEvents = 'none';
-            }
-
-            if (screen === 'loading') {
-                loadingScreen.classList.remove('hidden');
-            } else if (screen === 'results') {
-                resultsScreen.classList.remove('hidden');
-            } else if (screen === 'consent') {
-                // Esta pantalla ya es visible por defecto después del modal
-                consentScreenDiv.style.opacity = '1';
-                consentScreenDiv.style.pointerEvents = 'auto';
-            }
-        }
-
-        // Asegurarse de que los botones de consentimiento no sean visibles al cargar
-        // Se harán visibles al cerrar el modal
-        document.addEventListener('DOMContentLoaded', () => {
-             document.getElementById('consent-screen').style.opacity = '0';
-             document.getElementById('consent-screen').style.pointerEvents = 'none';
-        });
-
-    </script>
+    document.addEventListener('DOMContentLoaded', () => {
+        consentScreen.style.opacity = '0';
+        consentScreen.style.pointerEvents = 'none';
+    });
+</script>
 </body>
 </html>
 
