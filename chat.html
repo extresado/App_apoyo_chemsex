@@ -3,333 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat de Apoyo</title>
+    <title>Chat de Apoyo - BajadaSegura</title>
+    
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Carga de la fuente Montserrat (usada en index.html) -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- Reset y Estilos Globales --- */
-        * {
-            box-sizing: border-box;
+        /* Definición de colores neón (igual que index.html) */
+        :root {
+            --bg-dark: #000000;
+            --neon-pink: #FF00FF;
+            --neon-red: #FF3300;
+            --neon-blue: #00FFFF; /* Color primario para el chat */
+            --neon-purple: #9D00FF;
+            --text-light: #f0f0f0;
+            --font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Estilo del cuerpo para el fondo oscuro */
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
         }
 
-        body, html {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            height: 100%;
-            overflow: hidden; /* Evita el scroll mientras está el modal */
-        }
-
-        /* --- 1. Modal de Bienvenida --- */
-        #welcome-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* Contenedor principal con estilo de app nativa neón */
+        .app-container {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 1rem;
+            padding: 1.5rem;
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
+            max-width: 450px;
+            min-height: 90vh; /* Alto para parecer una app */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); /* Sombra neón azul */
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Botones de navegación (Volver y WhatsApp) */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-button {
+            color: var(--neon-blue);
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        .back-button:hover {
+            color: var(--neon-pink);
+        }
+
+        /* Botón de WhatsApp (Neón Verde, como el logo de WhatsApp) */
+        .whatsapp-button {
+            background-color: #25D366; /* WhatsApp Green */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px; /* Píldora */
+            font-weight: 600;
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 100;
-            transition: opacity 0.3s ease;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 0 10px rgba(37, 211, 102, 0.7); /* Sombra verde */
         }
 
-        #modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
+        .whatsapp-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(37, 211, 102, 1);
         }
 
-        #modal-content h2 {
-            margin-bottom: 0.5rem;
-        }
-
-        #modal-content p {
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            color: #555;
-        }
-
-        #welcome-form label {
-            display: block;
-            text-align: left;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        #welcome-form input {
-            width: 100%;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        #welcome-form button {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* --- 2. Contenedor del Chat --- */
-        #chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-
+        /* Área de mensajes del chat */
         #chat-messages {
-            flex-grow: 1; /* Ocupa todo el espacio posible */
-            overflow-y: auto; /* Permite scroll */
-            padding: 1rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem 0;
             display: flex;
             flex-direction: column;
+            gap: 0.75rem;
         }
 
-        /* Mensajes del chat */
+        /* Estilo base del mensaje */
         .message {
-            max-width: 75%;
+            max-width: 80%;
             padding: 0.75rem 1rem;
-            border-radius: 18px;
-            margin-bottom: 0.5rem;
-            line-height: 1.4;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: fadeIn 0.3s forwards;
+            border-radius: 0.75rem;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
         }
 
-        .bot-message {
-            background-color: #e9e9eb;
-            color: #000;
-            align-self: flex-start; /* Alinea a la izquierda */
-        }
-        
+        /* Mensaje del usuario (azul neón) */
         .user-message {
-            background-color: #007bff;
-            color: white;
-            align-self: flex-end; /* Alinea a la derecha */
+            align-self: flex-end;
+            background-color: var(--neon-blue);
+            color: var(--bg-dark); /* Texto oscuro para contraste */
+            border-bottom-right-radius: 0.25rem;
+            font-weight: 600;
         }
 
-        /* Animación de "escribiendo..." */
+        /* Mensaje del bot (fondo oscuro con brillo sutil) */
+        .bot-message {
+            align-self: flex-start;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            border-bottom-left-radius: 0.25rem;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        /* Indicador de "Escribiendo..." */
         .typing-indicator {
             align-self: flex-start;
-            margin-bottom: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--neon-blue);
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            /* Animación de puntos */
+            display: flex;
+            gap: 4px;
         }
         .typing-indicator span {
-            display: inline-block;
             width: 8px;
             height: 8px;
+            background-color: var(--neon-blue);
             border-radius: 50%;
-            background-color: #aaa;
-            margin: 0 2px;
-            animation: bounce 1s infinite ease-in-out;
+            animation: bounce 1.4s infinite ease-in-out both;
         }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
 
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
-
-
-        #chat-input-area {
+        /* Área de input y botón */
+        .input-area {
             display: flex;
-            padding: 1rem;
-            border-top: 1px solid #ddd;
-            background-color: #ffffff;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         #user-input {
             flex-grow: 1;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            padding: 0.75rem 1rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px;
+            border: 2px solid rgba(0, 255, 255, 0.4);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
             font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #user-input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
         }
 
         #send-button {
-            background: #007bff;
-            color: white;
+            background-color: var(--neon-blue);
+            color: var(--bg-dark);
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 700;
             border: none;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            margin-left: 0.5rem;
-            font-size: 1.2rem;
             cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
-        /* --- 3. Botón Flotante de WhatsApp --- */
-        #whatsapp-fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background-color: #25D366; /* Color de WhatsApp */
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: white;
-            font-size: 2rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            z-index: 90;
-        }
-
-        /* --- Clase de utilidad --- */
-        .hidden {
-            display: none !important; /* Oculta el elemento */
+        #send-button:hover {
+            background-color: #008fcc;
+            transform: translateY(-1px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.9);
         }
     </style>
 </head>
 <body>
+    
+    <div class="app-container">
 
-    <div id="welcome-modal">
-        <div id="modal-content">
-            <h2>Bienvenido</h2>
-            <p>Antes de empezar, nos gustaría saber un poco sobre ti. Esta información es anónima y nos ayuda a adaptar el apoyo.</p>
-            <form id="welcome-form">
-                <label for="nombre">Nombre (o apodo):</label>
-                <input type="text" id="nombre" placeholder="Tu nombre o apodo" required>
-                
-                <label for="edad">Edad:</label>
-                <input type="number" id="edad" placeholder="Tu edad" required min="16">
-                
-                <button type="submit">Comenzar a Chatear</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="chat-container" class="hidden">
-        <div id="chat-messages">
-            <div class="message bot-message">
-                <p>Hola. Soy un asistente virtual de apoyo e información. Estoy aquí para escucharte y ayudarte con dudas sobre chemsex y bienestar emocional. ¿Cómo te sientes hoy?</p>
-            </div>
+        <!-- Header y Botones de Navegación -->
+        <div class="nav-buttons">
+            <!-- Botón de Volver -->
+            <button class="back-button" onclick="history.back()">&#x2190; Volver</button>
+            
+            <!-- Botón de WhatsApp -->
+            <!-- **REEMPLAZA XXXXXXXXXXX con tu número de WhatsApp real (código de país incluido)** -->
+            <a href="https://wa.me/XXXXXXXXXXX" target="_blank" class="whatsapp-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-whatsapp"><path d="M22 17a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1z"/><path d="M12 2v2"/><path d="M7 14h10"/></svg>
+                WhatsApp
+            </a>
         </div>
         
-        <div id="chat-input-area">
-            <input type="text" id="user-input" placeholder="Escribe tu mensaje...">
-            <button id="send-button">➔</button>
+        <header class="text-center mb-4">
+            <h1 class="text-2xl font-bold" style="color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue);">
+                Conversación Segura
+            </h1>
+            <p class="text-xs text-gray-400 mt-1">Recuerda: Si es urgente, usa el botón de WhatsApp.</p>
+        </header>
+
+
+        <!-- Área de Mensajes -->
+        <div id="chat-messages" class="flex-1">
+            <!-- Mensaje de Bienvenida del Bot -->
+            <div class="message bot-message">Hola, soy el asistente de Bajada Segura. ¿En qué puedo ayudarte hoy? Recuerda que soy un bot y mi objetivo es ofrecerte información de apoyo, pero no soy un sustituto de la ayuda profesional urgente.</div>
+            
+            <!-- Aquí se cargarán los mensajes dinámicamente -->
+        </div>
+
+        <!-- Área de Input -->
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Escribe aquí tu mensaje de apoyo..." disabled>
+            <button id="send-button" disabled>Enviar</button>
         </div>
     </div>
 
-    <a href="https://wa.me/34659837581" id="whatsapp-fab" target="_blank" title="Hablar por WhatsApp">
-        💬
-    </a>
+    <!-- Modal de Bienvenida (Similar a tu código original, para asegurar el consentimiento) -->
+    <div id="welcome-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div id="modal-content" class="bg-gray-900 p-8 rounded-xl max-w-sm w-11/12 text-center border-2 border-opacity-50" style="border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue);">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--neon-pink);">Condiciones de Uso</h2>
+            <p class="text-sm text-gray-300 mb-6">
+                Este chat es una herramienta de apoyo y reducción de daños, no un servicio de emergencia. Si tú o alguien más está en peligro inmediato, usa el botón "Ayuda Urgente" o llama al 112.
+            </p>
+            <button id="accept-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 shadow-md" style="background-color: var(--neon-blue); color: var(--bg-dark); box-shadow: 0 0 10px var(--neon-blue);">
+                Entendido y Acepto
+            </button>
+        </div>
+    </div>
 
+
+    <!-- Lógica JavaScript para el Chat y la IA -->
     <script>
-        // --- CONSTANTES Y VARIABLES ---
+        // ** 1. CONFIGURACIÓN DE LA API (CORRECCIÓN CRÍTICA) **
+        // ** DEBES REEMPLAZAR ESTA CADENA CON LA URL REAL DE TU CLOUD FUNCTION **
+        // ** Ejemplo: 'https://us-central1-tu-proyecto-de-firebase.cloudfunctions.net/chatGemini' **
+        const API_URL = 'https://TU_URL_REAL_DE_CLOUD_FUNCTION.net/funcionDeChat'; 
         
-        // !! IMPORTANTE: Esta es la URL de tu Worker !!
-        const WORKER_URL = 'https://ia-tras-chat.chemsexcanarias.workers.dev';
-
-        // Elementos del DOM
-        const welcomeModal = document.getElementById('welcome-modal');
-        const chatContainer = document.getElementById('chat-container');
-        const welcomeForm = document.getElementById('welcome-form');
-        const chatMessages = document.getElementById('chat-messages');
+        // --- 2. Elementos del DOM ---
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
+        const chatMessages = document.getElementById('chat-messages');
+        const welcomeModal = document.getElementById('welcome-modal');
+        const acceptButton = document.getElementById('accept-button');
 
-        // Variables para guardar los datos del usuario
-        let userName = '';
-        let userAge = '';
+        // --- 3. Inicialización y Eventos ---
+        document.addEventListener('DOMContentLoaded', initializeChat);
 
-        // --- 1. Lógica del Formulario de Bienvenida ---
-        
-        welcomeForm.addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            
-            userName = document.getElementById('nombre').value;
-            userAge = document.getElementById('edad').value;
-            
-            welcomeModal.classList.add('hidden');
-            chatContainer.classList.remove('hidden');
-            document.body.style.overflow = 'auto';
-        });
+        function initializeChat() {
+            // Evento para el botón de aceptar del modal
+            acceptButton.addEventListener('click', () => {
+                welcomeModal.style.display = 'none';
+                userInput.disabled = false;
+                sendButton.disabled = false;
+                userInput.focus();
+            });
 
-        // --- 2. Lógica de Envío de Mensajes ---
-        
-        // Escuchar el clic en el botón
-        sendButton.addEventListener('click', sendMessage);
-        
-        // Escuchar la tecla "Enter" en el campo de texto
-        userInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
+            // Eventos de envío de mensaje
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
 
+        // --- 4. Lógica del Chat ---
+
+        /** Envía el mensaje del usuario a la API y maneja la respuesta */
         async function sendMessage() {
             const messageText = userInput.value.trim();
-            if (messageText === '') return; // No enviar mensajes vacíos
+            if (messageText === '' || userInput.disabled) return;
 
-            // 1. Mostrar el mensaje del usuario en el chat
             addMessageToChat(messageText, 'user-message');
-            userInput.value = ''; // Limpiar el campo
+            userInput.value = '';
+            userInput.disabled = true; // Deshabilita el input mientras espera
+            sendButton.disabled = true;
 
-            // 2. Mostrar indicador de "escribiendo..."
-            showTypingIndicator();
+            showTypingIndicator(); // Muestra el "escribiendo..."
 
             try {
-                // 3. Enviar el mensaje al Worker (Backend)
-                const response = await fetch(WORKER_URL, {
+                // Se ha eliminado el 'API_KEY' innecesario para Cloud Functions,
+                // ya que se asume que la autenticación se gestiona en el backend.
+                
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        message: messageText,
-                        nombre: userName,
-                        edad: userAge
-                    })
+                    body: JSON.stringify({ message: messageText }),
+                    // ** Solución para CORS: Si sigue fallando, la solución está en el servidor, no aquí. **
+                    // mode: 'cors' // Esto generalmente lo maneja el navegador y el servidor
                 });
 
-                // Quitar el indicador de "escribiendo..."
                 hideTypingIndicator();
 
                 if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
                 }
 
-                // 4. Recibir y mostrar la respuesta de la IA
                 const data = await response.json();
-                if (data.reply) {
-                    addMessageToChat(data.reply, 'bot-message');
-                } else {
-                    // Si el Worker devuelve un error de configuración u otro problema conocido:
-                    if (data.error) {
-                        addMessageToChat(data.error, 'bot-message');
-                    } else {
-                        throw new Error('Respuesta no válida del Worker');
-                    }
-                }
+                
+                // Asegúrate de que tu Cloud Function devuelva el texto en un campo llamado 'reply'
+                const botReply = data.reply || "Error: No se recibió una respuesta válida de la IA.";
+                addMessageToChat(botReply, 'bot-message');
 
             } catch (error) {
-                // 5. Manejar errores de conexión o fetch fallido
                 hideTypingIndicator();
-                addMessageToChat('Lo siento, ha ocurrido un error de conexión al backend. Inténtalo de nuevo más tarde o verifica la URL de tu Worker.', 'bot-message');
-                console.error('Error al enviar mensaje:', error);
+                addMessageToChat('Lo sentimos, no pudimos conectar con el asistente de IA. Por favor, revisa la URL de la API o usa el botón de WhatsApp.', 'bot-message');
+                console.error('Error al enviar mensaje a la API:', error);
+            } finally {
+                userInput.disabled = false;
+                sendButton.disabled = false;
+                userInput.focus();
             }
         }
 
-        // --- 3. Funciones de Ayuda (Helpers) ---
+        // --- 5. Funciones de Ayuda (Helpers) ---
 
         /** Añade un mensaje a la ventana del chat */
         function addMessageToChat(text, messageClass) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', messageClass);
-            messageElement.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`; // Convierte saltos de línea
+            // Reemplaza saltos de línea para mostrar el texto correctamente
+            messageElement.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`; 
             chatMessages.appendChild(messageElement);
             
             // Hacer scroll hasta el final
@@ -340,7 +357,7 @@
         function showTypingIndicator() {
             const indicator = document.createElement('div');
             indicator.id = 'typing-indicator';
-            indicator.classList.add('message', 'bot-message', 'typing-indicator');
+            indicator.classList.add('typing-indicator'); // Solo la clase de estilo
             indicator.innerHTML = '<span></span><span></span><span></span>';
             chatMessages.appendChild(indicator);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -353,6 +370,7 @@
                 chatMessages.removeChild(indicator);
             }
         }
+
     </script>
 </body>
 </html>
