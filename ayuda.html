@@ -25,12 +25,11 @@
             color: #f0f0f0;
             font-family: var(--font-family);
             min-height: 100vh;
-            padding: 2rem 1.5rem; /* Más padding para la página de contenido */
+            padding: 2rem 1.5rem;
             box-sizing: border-box;
             position: relative;
         }
         
-        /* Textura de ruido (igual que en index) */
         body::after {
             content: "";
             position: fixed;
@@ -52,24 +51,22 @@
             z-index: 1;
         }
 
-        /* Estilo para contenido de texto */
         .content-text {
             font-weight: 300;
-            font-size: 1.1rem; /* 18px */
+            font-size: 1.1rem;
             line-height: 1.7;
             color: #f0f0f0;
         }
-        
+
         .content-text strong {
             font-weight: 700;
             color: var(--neon-red);
         }
 
-        /* Botones de acción (consentimiento) */
         .btn-action {
             display: block;
             width: 100%;
-            padding: 1.25rem; /* Aumentado de 1rem a 1.25rem para más altura */
+            padding: 1.25rem;
             margin-top: 1.5rem;
             border: 2px solid var(--color-neon);
             color: var(--color-neon);
@@ -94,23 +91,6 @@
         .btn-deny { --color-neon: var(--neon-blue); }
         .btn-back { --color-neon: var(--neon-purple); margin-top: 2.5rem; }
 
-        /* Estilos del Modal (añadido) */
-        .modal-content {
-            box-shadow: 0 0 15px var(--neon-red), 0 0 30px var(--neon-red);
-        }
-
-        /* Ocultar/Mostrar (añadido) */
-        #consent-screen {
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-            pointer-events: none; /* Evita clics mientras está oculto */
-        }
-        #consent-screen.visible {
-            opacity: 1;
-            pointer-events: auto; /* Permite clics al ser visible */
-        }
-
-        /* Botón flotante 112 */
         .fab-112 {
             position: fixed;
             bottom: 30px;
@@ -123,7 +103,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem; /* 24px */
+            font-size: 1.5rem;
             font-weight: 700;
             text-decoration: none;
             box-shadow: 0 0 10px var(--neon-red), 0 0 25px var(--neon-red);
@@ -137,7 +117,6 @@
             100% { box-shadow: 0 0 10px var(--neon-red), 0 0 25px var(--neon-red); }
         }
 
-        /* Spinner de carga */
         .loader {
             width: 50px;
             height: 50px;
@@ -147,11 +126,8 @@
             animation: spin 1s linear infinite;
             margin: 2rem auto;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Contenedor de resultados */
         #results-container {
             margin-top: 2rem;
             padding: 1rem;
@@ -159,40 +135,26 @@
             border-radius: 0.5rem;
             background-color: rgba(255, 51, 0, 0.05);
         }
-        
         #results-container h3 {
             font-size: 1.2rem;
             font-weight: 700;
             color: var(--neon-red);
             margin-bottom: 1rem;
         }
-
         #results-container p {
-            white-space: pre-wrap; /* Mantiene saltos de línea de Gemini */
+            white-space: pre-wrap;
             line-height: 1.6;
             font-weight: 300;
-            word-wrap: break-word; /* Asegura que el texto de error no se salga */
         }
-
-        #results-sources {
-            margin-top: 1rem;
-            font-size: 0.8rem;
-            opacity: 0.7;
-        }
-        #results-sources a {
-            color: var(--neon-blue);
-            text-decoration: underline;
-        }
-
     </style>
 </head>
 <body class="bg-black">
 
-    <!-- Modal de Consentimiento -->
+    <!-- Modal de consentimiento -->
     <div id="consent-modal" class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm" style="z-index: 101;">
         <div class="modal-content max-w-md w-11/12 bg-[#1a1a1a] p-6 rounded-lg border-2 border-[var(--neon-red)] shadow-lg">
             <p class="content-text">
-                Estás en una situación de urgencia. Para encontrar los recursos de apoyo (hospitales, centros de ITS, ONGs) <strong>más cercanos a ti</strong>, necesitamos tu permiso para acceder a tu ubicación.
+                Estás en una situación de urgencia. Para encontrar los recursos más cercanos necesitamos tu permiso para acceder a tu ubicación.
             </p>
             <p class="content-text mt-4">
                 Tu ubicación <strong>no se guarda</strong> y solo se usa en este momento para ayudarte.
@@ -203,155 +165,122 @@
         </div>
     </div>
 
-    <!-- Botón flotante 112 -->
-    <a href="tel:112" class="fab-112">
-        112
-    </a>
+    <a href="tel:112" class="fab-112">112</a>
 
     <div class="main-container">
-
         <h1 class="text-3xl font-bold text-center mb-6" style="color: var(--neon-red);">
             AYUDA URGENTE
         </h1>
 
-        <!-- Pantalla 1: Consentimiento (Ahora solo botones, ocultos al inicio) -->
         <div id="consent-screen">
-            <!-- El texto <p> se ha movido al modal -->
-            
             <button id="consent-accept" class="btn-action btn-accept">
                 Buscar ayuda<br>cerca de mí
             </button>
-            
             <button id="consent-deny" class="btn-action btn-deny">
                 No, mostrar recursos generales
             </button>
         </div>
 
-        <!-- Pantalla 2: Cargando -->
         <div id="loading-screen" class="hidden text-center">
             <p class="content-text">Buscando recursos...</p>
             <div class="loader"></div>
             <p class="content-text text-sm opacity-80">(Esto puede tardar unos segundos)</p>
         </div>
 
-        <!-- Pantalla 3: Resultados (se rellena con JS) -->
         <div id="results-screen" class="hidden">
             <div id="results-container">
                 <h3>Recursos Encontrados:</h3>
                 <p id="results-text"></p>
-                <div id="results-sources" class="mt-4"></div>
             </div>
         </div>
 
-        <a href="index.html" class="btn-action btn-back">
-            Volver al inicio
-        </a>
-        
+        <a href="index.html" class="btn-action btn-back">Volver al inicio</a>
     </div>
 
     <script>
-    const consentModal = document.getElementById('consent-modal');
-    const modalOkButton = document.getElementById('modal-ok-button');
-    const consentScreen = document.getElementById('consent-screen');
-    const loadingScreen = document.getElementById('loading-screen');
-    const resultsScreen = document.getElementById('results-screen');
-    const resultsText = document.getElementById('results-text');
-    const resultsSources = document.getElementById('results-sources');
+        const consentModal = document.getElementById('consent-modal');
+        const modalOkButton = document.getElementById('modal-ok-button');
+        const consentScreen = document.getElementById('consent-screen');
+        const loadingScreen = document.getElementById('loading-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const resultsText = document.getElementById('results-text');
 
-    modalOkButton.addEventListener('click', () => {
-        consentModal.style.display = 'none';
-        consentScreen.classList.add('visible');
-    });
+        modalOkButton.addEventListener('click', () => {
+            consentModal.style.display = 'none';
+            consentScreen.classList.add('visible');
+        });
 
-    const acceptButton = document.getElementById('consent-accept');
-    const denyButton = document.getElementById('consent-deny');
-    acceptButton.addEventListener('click', handleAccept);
-    denyButton.addEventListener('click', handleDeny);
+        const acceptButton = document.getElementById('consent-accept');
+        const denyButton = document.getElementById('consent-deny');
+        acceptButton.addEventListener('click', handleAccept);
+        denyButton.addEventListener('click', handleDeny);
 
-    const apiKey = "AIzaSyAdE1IgXbIuOq6mLTJGSxKUqPRJjB57I-M"; 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        const apiKey = "AIzaSyAdE1IgXbIuOq6mLTJGSxKUqPRJjB57I-M"; 
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
-    function showScreen(screen) {
-        loadingScreen.classList.add('hidden');
-        resultsScreen.classList.add('hidden');
-        consentScreen.style.opacity = 0;
-        consentScreen.style.pointerEvents = 'none';
-
-        if (screen === 'loading') loadingScreen.classList.remove('hidden');
-        if (screen === 'results') resultsScreen.classList.remove('hidden');
-    }
-
-    function handleAccept() {
-        showScreen('loading');
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
-        } else {
-            locationError();
-        }
-    }
-
-    function handleDeny() {
-        showScreen('loading');
-        fetchResources(null);
-    }
-
-    function locationSuccess(position) {
-        const { latitude, longitude } = position.coords;
-        fetchResources({ lat: latitude, lon: longitude });
-    }
-
-    function locationError() {
-        console.warn("Error de geolocalización. Buscando recursos generales.");
-        fetchResources(null);
-    }
-
-    async function fetchResources(location) {
-        const systemPrompt = "Eres un asistente de apoyo en crisis de chemsex. Tu función es listar recursos de ayuda (hospitales, ONGs, líneas de ayuda). Prioriza recursos LGTBIQ+ y especializados en salud sexual. No des consejos médicos.";
-        
-        let userQuery;
-        if (location) {
-            userQuery = `Encuentra recursos de ayuda urgente (hospitales, ONGs, centros de salud sexual) cerca de la latitud ${location.lat} y longitud ${location.lon}.`;
-        } else {
-            userQuery = "Lista los principales recursos telefónicos u online para crisis de chemsex en España (ONGs, líneas de ayuda, hospitales) que sean LGTBIQ+ friendly.";
+        function showScreen(screen) {
+            loadingScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            consentScreen.style.opacity = 0;
+            consentScreen.style.pointerEvents = 'none';
+            if (screen === 'loading') loadingScreen.classList.remove('hidden');
+            if (screen === 'results') resultsScreen.classList.remove('hidden');
         }
 
-        const payload = {
-            contents: [
-                { parts: [{ text: `${systemPrompt}\n\n${userQuery}` }] }
-            ]
-        };
-
-        try {
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) throw new Error(`Error ${response.status}`);
-
-            const result = await response.json();
-            const candidate = result.candidates?.[0]?.content?.parts?.[0]?.text || "No se encontraron recursos.";
-            displayResults(candidate);
-
-        } catch (error) {
-            console.error("Error al buscar recursos:", error);
-            displayResults("⚠️ No se pudieron cargar los recursos. Intenta nuevamente o llama al 112 en caso de emergencia.");
+        function handleAccept() {
+            showScreen('loading');
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(locationSuccess, locationError);
+            } else { locationError(); }
         }
-    }
 
-    function displayResults(text) {
-        resultsText.innerText = text;
-        resultsSources.innerHTML = "";
-        showScreen('results');
-    }
+        function handleDeny() {
+            showScreen('loading');
+            fetchResources(null);
+        }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        consentScreen.style.opacity = '0';
-        consentScreen.style.pointerEvents = 'none';
-    });
-</script>
+        function locationSuccess(position) {
+            const { latitude, longitude } = position.coords;
+            fetchResources({ lat: latitude, lon: longitude });
+        }
+
+        function locationError() {
+            console.warn("Error de geolocalización. Buscando recursos generales.");
+            fetchResources(null);
+        }
+
+        async function fetchResources(location) {
+            const systemPrompt = "Eres un asistente de apoyo en crisis de chemsex. Tu función es listar recursos de ayuda (hospitales, ONGs, líneas de ayuda). Prioriza recursos LGTBIQ+ y especializados en salud sexual. No des consejos médicos.";
+            let userQuery = location
+                ? `Encuentra recursos de ayuda urgente cerca de la latitud ${location.lat} y longitud ${location.lon}.`
+                : "Lista recursos telefónicos u online para crisis de chemsex en España (ONGs, hospitales, líneas de ayuda).";
+            const payload = { contents: [{ parts: [{ text: `${systemPrompt}\n\n${userQuery}` }] }] };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`Error ${response.status}`);
+                const result = await response.json();
+                const candidate = result.candidates?.[0]?.content?.parts?.[0]?.text || "No se encontraron recursos.";
+                displayResults(candidate);
+            } catch (error) {
+                console.error("Error al buscar recursos:", error);
+                displayResults("⚠️ No se pudieron cargar los recursos. Intenta nuevamente o llama al 112.");
+            }
+        }
+
+        function displayResults(text) {
+            resultsText.innerText = text;
+            showScreen('results');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            consentScreen.style.opacity = '0';
+            consentScreen.style.pointerEvents = 'none';
+        });
+    </script>
 </body>
 </html>
-
-
