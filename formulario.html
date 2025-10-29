@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Chemsex - @BajadaSegura</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Diseño "Radical Dark" con alto contraste */
+        body { font-family: 'Inter', sans-serif; background-color: #0d0d0d; }
+        .radical-card {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(100, 100, 255, 0.2);
+        }
+        .question-box {
+            background-color: #2a2a2a;
+            border-left: 5px solid #6366f1; /* Indigo */
+            min-height: 150px;
+        }
+        .radio-label {
+            transition: all 0.2s;
+            border: 1px solid #444;
+            color: #d1d5db;
+        }
+        input[type="radio"]:checked + .radio-label {
+            background-color: #f472b6; /* Pink */
+            color: white;
+            border-color: #ec4899;
+            box-shadow: 0 0 10px #f472b6;
+            font-weight: 600;
+        }
+        
+        /* Estilos de botones de acción */
+        #reflectionButton { background-color: #f472b6; }
+        #resourcesButton { background-color: #10b981; }
+        #emergencyButton, #emergencyButtonResults { background-color: #ef4444; } /* Red-500 */
+
+        /* Estilos para el texto de resultado (markdown) */
+        .markdown-output h1 { font-size: 1.75rem; font-weight: 800; margin-top: 1rem; margin-bottom: 0.5rem; color: #6366f1;}
+        .markdown-output h2 { font-size: 1.5rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #10b981;}
+        .markdown-output p { margin-bottom: 0.75rem; line-height: 1.6; }
+        .markdown-output a { color: #10b981; text-decoration: underline; font-weight: 600; }
+        .markdown-output ul { list-style-type: disc; margin-left: 1.5rem; padding-top: 0.5rem;}
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffffff; 
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8 flex items-center justify-center">
+
+    <div id="appContainer" class="max-w-xl w-full">
+
+        <div class="radical-card p-6 sm:p-8 rounded-3xl shadow-2xl">
+            <header class="mb-8 text-center border-b border-gray-700 pb-4">
+                <!-- RUTA CORREGIDA: Asumiendo que 1000025194.jpg está en la misma carpeta que este HTML -->
+                <img src="1000025194.png" alt="Logo de Bajada Segura"/>
+                <h1 class="text-4xl font-black mb-2 text-white">CHEMSEX</h1>
+                <p class="text-sm text-gray-500">Una herramienta de orientación. Confidencial y Anónima.</p>
+            </header>
+
+            <!-- Contenedor principal de los pasos -->
+            <div id="quizContent">
+                
+                <!-- 1. Paso de Pregunta (Se renderizará dinámicamente) -->
+                <div id="questionStep" class="hidden space-y-6">
+                    <div class="question-box p-6 rounded-xl shadow-lg">
+                        <p id="questionNumber" class="text-sm font-semibold mb-2 text-indigo-400"></p>
+                        <p id="questionText" class="text-xl font-bold"></p>
+                    </div>
+
+                    <div id="optionsContainer" class="space-y-3">
+                        <!-- Opciones de radio inyectadas aquí -->
+                    </div>
+
+                    <div class="flex justify-between pt-4">
+                        <button id="prevButton" class="px-5 py-2 text-sm font-semibold bg-gray-700 text-white rounded-full hover:bg-gray-600 transition duration-150 disabled:opacity-50" disabled>
+                            &larr; Anterior
+                        </button>
+                        <button id="nextButton" class="px-5 py-2 text-sm font-semibold bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition duration-150 disabled:opacity-50">
+                            Siguiente &rarr;
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Paso de Input Personalizado y Ubicación -->
+                <div id="inputStep" class="hidden space-y-6">
+                    <div class="question-box p-6 rounded-xl shadow-lg">
+                        
+                        <p class="text-xl font-bold mb-3">Información Adicional</p>
+
+                        <!-- Input de Ubicación (MANDATORIO) -->
+                        <div>
+                            <label for="userLocation" class="block text-sm font-medium text-indigo-400 mb-1">¿En qué ciudad o región te encuentras? (Obligatorio para recursos locales)</label>
+                            <input type="text" id="userLocation" required placeholder="Ej: Madrid, Barcelona o Islas Canarias" class="w-full p-3 rounded-lg bg-[#1a1a1a] border border-gray-600 focus:border-pink-500 focus:ring-0 text-white placeholder-gray-500">
+                        </div>
+
+                        <!-- Notas Personalizadas (Opcional) -->
+                        <div class="mt-4">
+                            <label for="customNotes" class="block text-sm font-medium text-indigo-400 mb-1">¿Quieres añadir algo más?
+                                
+                            </label>
+                            <p class="text-gray-400 text-xs mb-2">Cualquier pensamiento o contexto que me des es valioso para evaluar correctamente en que situación estas.</p>
+                            <textarea id="customNotes" rows="4" class="w-full p-3 rounded-lg bg-[#1a1a1a] border border-gray-600 focus:border-pink-500 focus:ring-0 text-white placeholder-gray-500"></textarea>
+                        </div>
+
+                    </div>
+                    <div class="flex justify-between pt-4">
+                        <button id="inputPrevButton" class="px-5 py-2 text-sm font-semibold bg-gray-700 text-white rounded-full hover:bg-gray-600 transition duration-150">
+                            &larr; Anterior
+                        </button>
+                        <button id="inputNextButton" class="px-5 py-2 text-sm font-semibold bg-pink-500 text-white rounded-full hover:bg-pink-600 transition duration-150">
+                            Continuar a Opciones
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- 3. Paso Final de Acciones -->
+                <div id="actionStep" class="hidden text-center space-y-6">
+                    <div class="question-box p-6 rounded-xl shadow-lg text-center">
+                        <p class="text-2xl font-bold text-indigo-400 mb-2">¡Cuestionario Completo!</p>
+                        <p class="text-gray-300">Gracias por tu honestidad. Has dado un gran paso. ¿Qué camino eliges ahora?</p>
+                        <p id="finalScoreText" class="text-lg font-bold mt-3 text-pink-500"></p>
+                    </div>
+
+                    <!-- Botón de Emergencia (Destacado) -->
+                    <button id="emergencyButton" class="w-full px-6 py-4 font-black text-white rounded-xl shadow-lg hover:bg-red-600 transition duration-200" onclick="handleEmergency()">
+                        LLAMAR AL 112 (Emergencia)
+                    </button>
+
+                    <div class="flex flex-col space-y-4">
+                        <button id="reflectionButton" class="px-6 py-4 font-bold text-white rounded-xl shadow-lg hover:bg-pink-600 transition duration-200 flex items-center justify-center">
+                            <span id="reflectionButtonText">Reflexión Personalizada + Recursos (LGTBIQ+)</span>
+                            <div id="reflectionSpinner" class="spinner ml-3 hidden"></div>
+                        </button>
+                        <button id="resourcesButton" class="px-6 py-4 font-bold text-white rounded-xl shadow-lg hover:bg-green-600 transition duration-200 flex items-center justify-center">
+                            <span id="resourcesButtonText">Solo Recursos de Apoyo (LGTBIQ+ Amigables)</span>
+                            <div id="resourcesSpinner" class="spinner ml-3 hidden"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Paso de Resultados -->
+                <div id="resultStep" class="hidden">
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-xl text-gray-200">
+                        <h2 id="resultTitle" class="text-2xl font-black mb-4 text-indigo-400 border-b border-gray-700 pb-3"></h2>
+                        <div id="resultOutput" class="markdown-output min-h-[100px] text-gray-300">
+                            <!-- Contenido de la IA o Search -->
+                        </div>
+                    </div>
+                    
+                    <!-- Botón de Emergencia en Resultados -->
+                    <button id="emergencyButtonResults" class="mt-6 w-full px-6 py-3 font-black text-white rounded-xl shadow-lg hover:bg-red-600 transition duration-200" onclick="handleEmergency()">
+                        LLAMAR AL 112 (Emergencia)
+                    </button>
+
+                    <button id="resetButton" class="mt-4 w-full px-6 py-3 font-bold bg-gray-600 text-white rounded-xl shadow-lg hover:bg-gray-700 transition duration-200">
+                        Reiniciar el Cuestionario
+                    </button>
+                </div>
+
+                <!-- Área de mensaje de error -->
+                <div id="errorContainer" class="mt-6 p-4 bg-red-900 bg-opacity-30 border border-red-700 text-red-400 rounded-lg hidden text-sm">
+                    <p id="errorMessage"></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // AVISO CRÍTICO DE SEGURIDAD:
+        // Por tu solicitud, esta clave API se incluye aquí. Si la app se usa públicamente,
+        // CUALQUIER TERCERO PUEDE COPIARLA. Para un uso profesional, DEBES usar un proxy
+        // de servidor para proteger tu clave.
+        const apiKey = "AIzaSyAdE1IgXbIuOq6mLTJGSxKUqPRJjB57I-M"; 
+        
+        const API_URL_BASE = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        const MAX_RETRIES = 5;
+        const INITIAL_DELAY = 1000;
+        const PARTNER_NAME = "@BajadaSegura";
+        const EMERGENCY_NUMBER = "112"; // Número de emergencia europeo
+
+        // Estado de la aplicación
+        let currentStep = 0;
+        const scores = Array(10).fill(null);
+        let totalScore = 0;
+        let customNotes = "";
+        let userLocation = "";
+
+        const questionsData = [
+            { text: "¿Con qué frecuencia consumes drogas específicamente para tener o prolongar encuentros sexuales?", name: "q1" },
+            { text: "¿Has intentado reducir o controlar el uso de drogas para el sexo sin conseguirlo?", name: "q2" },
+            { text: "¿Sientes una fuerte necesidad o compulsión (craving) de usar drogas antes o durante el sexo?", name: "q3" },
+            { text: "¿El uso de drogas en este contexto ha causado problemas significativos en tu trabajo o relaciones personales?", name: "q4" },
+            { text: "¿Has continuado con el chemsex a pesar de saber que está afectando negativamente tu salud (física o mental)?", name: "q5" },
+            { text: "¿Necesitas aumentar la cantidad de droga para lograr el efecto deseado durante las sesiones de chemsex (tolerancia)?", name: "q6" },
+            { text: "¿Has experimentado síntomas de malestar físico o emocional (abstinencia) cuando no has tenido chemsex por un tiempo?", name: "q7" },
+            { text: "¿Dedicas mucho tiempo a planificar, conseguir, consumir o recuperarte de las sesiones de chemsex?", name: "q8" },
+            { text: "¿Has abandonado o reducido actividades importantes (hobbies, socializar sin drogas) debido al chemsex?", name: "q9" },
+            { text: "¿Has tenido sexo inseguro o tomado decisiones de riesgo bajo los efectos de las drogas, de las que luego te arrepientes?", name: "q10" },
+        ];
+
+        const options = [
+            { label: "Nunca", value: 0 },
+            { label: "Raramente", value: 1 },
+            { label: "A veces", value: 2 },
+            { label: "Frecuentemente", value: 3 },
+            { label: "Casi siempre", value: 4 },
+        ];
+
+        // Referencias del DOM
+        const questionStep = document.getElementById('questionStep');
+        const inputStep = document.getElementById('inputStep');
+        const actionStep = document.getElementById('actionStep');
+        const resultStep = document.getElementById('resultStep');
+        const questionNumber = document.getElementById('questionNumber');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        const customNotesEl = document.getElementById('customNotes');
+        const userLocationEl = document.getElementById('userLocation');
+        const inputPrevButton = document.getElementById('inputPrevButton');
+        const inputNextButton = document.getElementById('inputNextButton');
+        const finalScoreText = document.getElementById('finalScoreText');
+        const reflectionButton = document.getElementById('reflectionButton');
+        const reflectionSpinner = document.getElementById('reflectionSpinner');
+        const reflectionButtonText = document.getElementById('reflectionButtonText');
+        const resourcesButton = document.getElementById('resourcesButton');
+        const resourcesSpinner = document.getElementById('resourcesSpinner');
+        const resourcesButtonText = document.getElementById('resourcesButtonText');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultOutput = document.getElementById('resultOutput');
+        const resetButton = document.getElementById('resetButton');
+        const errorContainer = document.getElementById('errorContainer');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // --- Navegación de la Aplicación ---
+
+        function showStep(stepName) {
+            questionStep.classList.add('hidden');
+            inputStep.classList.add('hidden');
+            actionStep.classList.add('hidden');
+            resultStep.classList.add('hidden');
+            hideError();
+
+            if (stepName === 'question') {
+                questionStep.classList.remove('hidden');
+            } else if (stepName === 'input') {
+                inputStep.classList.remove('hidden');
+            } else if (stepName === 'action') {
+                actionStep.classList.remove('hidden');
+            } else if (stepName === 'result') {
+                resultStep.classList.remove('hidden');
+            }
+        }
+
+        function renderStep() {
+            if (currentStep < questionsData.length) {
+                // Paso de preguntas
+                showStep('question');
+                const q = questionsData[currentStep];
+                questionNumber.textContent = `Pregunta ${currentStep + 1} de ${questionsData.length}`;
+                questionText.textContent = q.text;
+
+                optionsContainer.innerHTML = options.map(option => `
+                    <label class="flex items-center">
+                        <input type="radio" name="${q.name}" value="${option.value}" class="hidden" 
+                            ${scores[currentStep] !== null && parseInt(scores[currentStep]) === option.value ? 'checked' : ''}>
+                        <span class="radio-label w-full px-4 py-3 rounded-xl cursor-pointer shadow-sm hover:bg-[#383838]">
+                            ${option.label}
+                        </span>
+                    </label>
+                `).join('');
+
+                prevButton.disabled = currentStep === 0;
+                
+                // Forzamos el re-attach de listeners para las opciones
+                document.querySelectorAll(`input[name="${q.name}"]`).forEach(input => {
+                    input.addEventListener('change', () => {
+                        scores[currentStep] = input.value;
+                        nextButton.disabled = false;
+                    });
+                });
+                
+                nextButton.disabled = scores[currentStep] === null;
+
+            } else if (currentStep === questionsData.length) {
+                // Paso de input personalizado
+                showStep('input');
+                customNotesEl.value = customNotes; // Cargar notas si existen
+                userLocationEl.value = userLocation; // Cargar ubicación si existe
+            }
+            else {
+                // Paso de acciones
+                totalScore = scores.reduce((sum, score) => sum + parseInt(score), 0);
+                finalScoreText.textContent = `Puntuación Total: ${totalScore} de 40 puntos.`;
+                showStep('action');
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < questionsData.length) {
+                const checked = document.querySelector(`input[name="${questionsData[currentStep].name}"]:checked`);
+                if (!checked) {
+                    displayError("Por favor, selecciona una opción para continuar.");
+                    return;
+                }
+                scores[currentStep] = checked.value;
+                currentStep++;
+                renderStep();
+            }
+        }
+
+        function inputStepNext() {
+            const location = userLocationEl.value.trim();
+            if (location === "") {
+                displayError("El campo de Ciudad/Región es obligatorio para buscar recursos.");
+                return;
+            }
+            userLocation = location;
+            customNotes = customNotesEl.value; // Guardar las notas
+            currentStep++; // Mover al paso de acciones
+            renderStep();
+        }
+
+        function inputStepPrev() {
+            customNotes = customNotesEl.value; // Guardar las notas antes de volver
+            userLocation = userLocationEl.value.trim(); // Guardar ubicación antes de volver
+            currentStep--; // Volver al paso anterior de preguntas
+            renderStep();
+        }
+
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderStep();
+            }
+        }
+
+        function resetQuiz() {
+            currentStep = 0;
+            scores.fill(null);
+            totalScore = 0;
+            customNotes = "";
+            userLocation = "";
+            resultOutput.innerHTML = '';
+            reflectionButton.disabled = false;
+            resourcesButton.disabled = false;
+            reflectionButtonText.textContent = "Reflexión Personalizada + Recursos (LGTBIQ+)";
+            resourcesButtonText.textContent = "Solo Recursos de Apoyo (LGTBIQ+ Amigables)";
+            showStep('question');
+            renderStep();
+        }
+        
+        function handleEmergency() {
+            // Muestra un mensaje amigable en lugar de un alert(), ya que alert() está prohibido.
+            resultOutput.innerHTML = `
+                <div class="p-4 bg-red-800 rounded-xl shadow-xl">
+                    <h2 class="text-white text-xl font-bold mb-2">ATENCIÓN: LLAMADA DE EMERGENCIA</h2>
+                    <p class="text-red-200">Si tú o alguien más está en peligro inmediato, es fundamental que marques el número de emergencia ahora.</p>
+                    <p class="text-3xl font-black mt-3 text-yellow-300">TELÉFONO: ${EMERGENCY_NUMBER}</p>
+                    <p class="text-red-300 mt-3">Por favor, marca el ${EMERGENCY_NUMBER} en tu teléfono. Mantén la calma y sigue las instrucciones del operador.</p>
+                </div>
+            `;
+            resultTitle.textContent = "Emergencia: Contacto Inmediato";
+            showStep('result');
+        }
+
+        // --- Llamadas a la API y Lógica de Evaluación ---
+
+        async function retryFetchWithBackoff(url, options, retries = MAX_RETRIES) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.status === 429 || response.status >= 500) {
+                        if (i === retries - 1) throw new Error(`API failed after ${retries} attempts with status ${response.status}.`);
+                        const delay = INITIAL_DELAY * (2 ** i) + Math.random() * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue;
+                    }
+                    return response;
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    const delay = INITIAL_DELAY * (2 ** i) + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        /**
+         * Llama a Gemini para la evaluación personal basada en la puntuación y notas.
+         */
+        async function handleReflection() {
+            // Deshabilitar botones y mostrar carga
+            reflectionButton.disabled = true;
+            resourcesButton.disabled = true;
+            reflectionButtonText.textContent = "Analizando tu Reflexión...";
+            reflectionSpinner.classList.remove('hidden');
+            resultTitle.textContent = "Reflexión Personalizada y Recursos (LGTBIQ+)";
+            resultOutput.innerHTML = '<p class="text-center text-indigo-400 font-medium py-8">Conectando con un agente para la evaluación...</p>';
+            
+            showStep('result');
+
+            const maxScore = questionsData.length * 4;
+            let userPrompt = `Mi puntuación en el Cuestionario de Riesgo Chemsex es ${totalScore} de un máximo de ${maxScore} puntos. Por favor, interpreta este resultado.`;
+            
+            if (customNotes.trim() !== "") {
+                userPrompt += ` Además, el usuario ha añadido las siguientes notas personales para que las consideres en la evaluación: "${customNotes.trim()}".`;
+            }
+
+            const systemPrompt = `Actúa como un amigo personal, empático y profesional que habla directamente con la persona que tomó el test. Tu tarea es proporcionar una evaluación objetiva y no diagnóstica del nivel de riesgo de Chemsex basándote en la puntuación y las notas. La evaluación debe ser clara, sensible y siempre debe terminar validando la emoción del usuario y ofreciendo un consejo de acción positivo y profesional.
+
+            Usa el siguiente criterio de riesgo (NO lo muestres):
+            - 0-10 puntos: Riesgo bajo.
+            - 11-20 puntos: Riesgo moderado.
+            - 21-30 puntos: Riesgo significativo.
+            - 31-40 puntos: Riesgo alto/grave.
+
+            La respuesta debe tener un tono de apoyo y confidencialidad. Una vez finalizada la reflexión, finaliza el texto con un título H2 (##) que diga "Recursos de Apoyo Localizados." para dar paso a la siguiente sección.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+
+            try {
+                const response = await retryFetchWithBackoff(API_URL_BASE, options);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    const errorDetail = result.error?.message || response.statusText;
+                    throw new Error(`Error de la API: ${errorDetail}.`);
+                }
+
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar la reflexión. Inténtalo de nuevo.";
+                resultOutput.innerHTML = marked(text);
+
+                // Después de la reflexión, llama inmediatamente a la búsqueda de recursos
+                await handleResourcesSearch(true);
+
+            } catch (error) {
+                console.error("Error en la evaluación de Gemini:", error);
+                resultOutput.innerHTML = '<p class="text-red-500 font-bold">Error en la Reflexión:</p><p>Lo siento, hubo un problema al contactar con la IA. Por favor, intenta la opción de Recursos Directos.</p>';
+                reflectionButton.disabled = false;
+                resourcesButton.disabled = false;
+                reflectionButtonText.textContent = "Reflexión Personalizada + Recursos (LGTBIQ+)";
+                reflectionSpinner.classList.add('hidden');
+                resultOutput.innerHTML += '<p class="mt-4"><strong>Recursos Locales no disponibles por fallo.</strong></p>';
+            }
+        }
+
+        /**
+         * Llama a Gemini con Google Search para encontrar recursos locales (usada por ambos botones).
+         */
+        async function handleResourcesSearch(isReflectionCombined = false) {
+            
+            // Si NO está combinado con la reflexión, preparamos la interfaz
+            if (!isReflectionCombined) {
+                resourcesButton.disabled = true;
+                reflectionButton.disabled = true;
+                resourcesButtonText.textContent = "Buscando...";
+                resourcesSpinner.classList.remove('hidden');
+                resultTitle.textContent = "Recursos de Apoyo Localizados";
+                resultOutput.innerHTML = '<p class="text-center text-indigo-400 font-medium py-8">Usando Google Search para encontrar ayuda profesional cerca de ti...</p>';
+                showStep('result');
+            } else {
+                // Si es combinado, añadir la carga debajo del texto de reflexión
+                resultOutput.innerHTML += '<p class="text-center text-green-500 font-bold mt-6">Buscando Recursos LGTBIQ+ Amigables...</p>';
+                reflectionButtonText.textContent = "Buscando Recursos...";
+            }
+
+            const searchLocation = userLocation || "España"; // Usa España como fallback
+            
+            const userQuery = `Busca 3 a 5 centros de ayuda para adicciones, chemsex, y salud mental con enfoque o amigables con la comunidad LGTBIQ+ en ${searchLocation}. Si no encuentras recursos específicos LGTBIQ+, proporciona recursos generales de adicciones en esa área. Incluye el nombre, enlace web (si es posible) y un breve resumen.`;
+            
+            // Este system prompt es la clave para la especificidad y el fallback
+            const systemPrompt = `Actúa como un asistente profesional. Tu objetivo es proporcionar una lista de recursos locales de ayuda profesional (centros de adicciones, salud mental, ONGs) con especial énfasis en servicios LGTBIQ+-amigables o específicos para Chemsex en la ubicación proporcionada. Si no encuentras recursos LGTBIQ+ en esa ciudad, proporciona los mejores centros generales de adicciones/salud mental en ${searchLocation}. Genera la lista con nombres, enlaces y una breve descripción. Es FUNDAMENTAL que los resultados sean enlaces reales a organizaciones.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                tools: [{ "google_search": {} }], // Habilitar Google Search
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+
+            try {
+                const response = await retryFetchWithBackoff(API_URL_BASE, options);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    const errorDetail = result.error?.message || response.statusText;
+                    throw new Error(`Error de la API: ${errorDetail}.`);
+                }
+
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo encontrar recursos. Inténtalo de nuevo con una búsqueda más específica.";
+                
+                if (isReflectionCombined) {
+                    resultOutput.innerHTML += marked(text);
+                } else {
+                    resultOutput.innerHTML = marked(text);
+                }
+
+            } catch (error) {
+                console.error("Error en la búsqueda de recursos:", error);
+                
+                const errorHtml = '<p class="text-red-500 font-bold">Error en la Búsqueda de Recursos:</p><p>Lo siento, hubo un problema al contactar con Google Search. No se pudieron encontrar recursos. Intenta reiniciar.</p>';
+                if (isReflectionCombined) {
+                    resultOutput.innerHTML += errorHtml;
+                } else {
+                    resultOutput.innerHTML = errorHtml;
+                }
+            } finally {
+                resourcesButton.disabled = false;
+                reflectionButton.disabled = false;
+                resourcesButtonText.textContent = "Solo Recursos de Apoyo (LGTBIQ+ Amigables)";
+                reflectionButtonText.textContent = "Reflexión Personalizada + Recursos (LGTBIQ+)";
+                resourcesSpinner.classList.add('hidden');
+                reflectionSpinner.classList.add('hidden');
+            }
+        }
+
+        // --- Utilidades de Markdown y Error ---
+        function marked(markdown) {
+            let html = markdown
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/^- (.*$)/gim, '<li>$1</li>')
+                .replace(/\n\n/gim, '</p><p>')
+                .replace(/(^<p>|<\/p>$)/g, ''); 
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+            if (!html.startsWith('<h') && !html.startsWith('<li') && !html.startsWith('<a')) {
+                html = `<p>${html}</p>`;
+            }
+            html = html.replace(/((?:<li>.*?<\/li>\s*)+)/gs, '<ul>$1</ul>');
+            html = html.replace(/<\/p><ul>/g, '<ul>'); 
+            html = html.replace(/<\/li><p>/g, '</li>'); 
+            
+            return html;
+        }
+
+        function displayError(message) {
+            errorMessage.textContent = message;
+            errorContainer.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorContainer.classList.add('hidden');
+        }
+
+        // --- Event Listeners y Inicialización ---
+        window.onload = () => {
+            nextButton.addEventListener('click', nextStep);
+            prevButton.addEventListener('click', prevStep);
+            inputNextButton.addEventListener('click', inputStepNext);
+            inputPrevButton.addEventListener('click', inputStepPrev);
+
+            reflectionButton.addEventListener('click', handleReflection);
+            resourcesButton.addEventListener('click', () => {
+                handleResourcesSearch(false); // Falso indica que no está combinado con la reflexión
+            });
+            resetButton.addEventListener('click', resetQuiz);
+            
+            // Iniciar la aplicación en el primer paso
+            renderStep();
+        };
+
+    </script>
+</body>
+</html>
+
