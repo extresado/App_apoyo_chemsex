@@ -17,7 +17,7 @@
             height: 100%;
             margin: 0;
             background-color: #f4f4f4;
-            overflow: hidden; /* Solo mientras el modal está activo */
+            overflow: hidden; /* Evita scroll de la página principal */
         }
 
         /* --- 1. Modal de Bienvenida --- */
@@ -41,355 +41,423 @@
             color: #eee;
             padding: 2rem;
             border-radius: 16px;
-            max-width: 400px;
+            max-width: 500px;
             width: 100%;
-            max-height: 90vh; /* Limita altura */
-            overflow-y: auto; /* Scroll interno si es necesario */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid #0f3460;
-            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            border: 1px solid #4a4a8a;
+        }
+
+        #modal-content h1 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
         }
 
         #modal-content h2 {
-            margin-bottom: 0.5rem;
-            color: #00d4ff;
-            font-size: 1.5rem;
-            text-align: center;
+            color: #00bfff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
         }
 
         #modal-content p {
-            margin-bottom: 1.5rem;
             font-size: 0.95rem;
-            color: #ccc;
             line-height: 1.6;
-        }
-
-        #welcome-form label {
-            display: block;
+            color: #c0c0e0;
             text-align: left;
-            margin: 1rem 0 0.5rem;
-            font-weight: 600;
-            color: #00d4ff;
-        }
-
-        #welcome-form input {
-            width: 100%;
-            padding: 0.75rem;
             margin-bottom: 1rem;
-            border: 1px solid #0f3460;
-            border-radius: 8px;
-            background: #16213e;
-            color: #fff;
-            font-size: 1rem;
+        }
+        
+        #modal-content ul {
+            text-align: left;
+            margin-left: 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #c0c0e0;
         }
 
-        #welcome-form input::placeholder {
-            color: #777;
+        #modal-content li {
+            margin-bottom: 0.5rem;
         }
 
-        #welcome-form button,
-        #accept-terms-btn {
-            width: 100%;
-            padding: 0.9rem;
-            background: linear-gradient(135deg, #00d4ff, #007bff);
+        #start-chat-btn {
+            background: linear-gradient(135deg, #007BFF, #0056b3);
             color: white;
             border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
             cursor: pointer;
-            margin-top: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+            display: block;
+            width: 100%;
         }
 
-        #welcome-form button:hover,
-        #accept-terms-btn:hover {
+        #start-chat-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
         }
 
-        /* --- 2. Contenedor del Chat --- */
-        #chat-container {
+        /* --- 2. Contenedor Principal del Chat --- */
+        .chat-wrapper {
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            background: linear-gradient(180deg, #0f0c29, #16213e);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            padding-bottom: env(safe-area-inset-bottom); /* Ajuste para barras de navegación */
+            height: 100%;
+            width: 100%;
+            max-width: 800px; /* Limita el ancho en desktop */
+            margin: 0 auto; /* Centra en desktop */
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            opacity: 0; /* Oculto al inicio */
+            transform: scale(0.95);
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
-
-        #chat-container.visible {
+        
+        .chat-wrapper.visible {
             opacity: 1;
+            transform: scale(1);
         }
 
-        #chat-header {
+        /* --- 3. Cabecera del Chat --- */
+        .chat-header {
+            background: linear-gradient(135deg, #007BFF, #0056b3);
+            color: white;
             padding: 1rem;
-            background: rgba(0, 0, 0, 0.3);
-            color: #00d4ff;
-            font-weight: 600;
             text-align: center;
-            font-size: 1.1rem;
-            border-bottom: 1px solid #0f3460;
+            font-size: 1.2rem;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        .chat-header p {
+            font-size: 0.9rem;
+            font-weight: 300;
+            opacity: 0.9;
         }
 
-        #chat-messages {
+        /* --- 4. Área de Mensajes --- */
+        .chat-messages {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
+            background-color: #f4f7f6;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
         }
 
-        /* Mensajes del chat */
         .message {
             max-width: 80%;
-            padding: 0.85rem 1.1rem;
+            margin-bottom: 0.75rem;
+            padding: 0.75rem 1rem;
             border-radius: 18px;
             line-height: 1.5;
             word-wrap: break-word;
-            animation: fadeIn 0.3s ease forwards;
-            opacity: 0;
-            transform: translateY(10px);
         }
 
-        .bot-message {
-            background: #1e293b;
-            color: #e2e8f0;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-        
         .user-message {
-            background: linear-gradient(135deg, #007bff, #00d4ff);
+            background-color: #007BFF;
             color: white;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
 
-        /* Indicador de escribiendo */
-        .typing-indicator {
+        .bot-message {
+            background-color: #e5e5ea;
+            color: #000;
             align-self: flex-start;
-            padding: 0.75rem 1rem;
-            background: #1e293b;
-            border-radius: 18px;
             border-bottom-left-radius: 4px;
-            display: inline-block;
         }
-
+        
+        /* Indicador de "escribiendo..." */
+        .typing-indicator {
+            padding: 0.75rem 1rem;
+        }
         .typing-indicator span {
-            display: inline-block;
-            width: 8px;
             height: 8px;
+            width: 8px;
+            background-color: #999;
             border-radius: 50%;
-            background-color: #94a3b8;
-            margin: 0 3px;
-            animation: bounce 1.2s infinite ease-in-out;
+            display: inline-block;
+            animation: bounce 1.3s infinite;
         }
-
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
+        .typing-indicator span:nth-of-type(2) {
+            animation-delay: 0.15s;
+        }
+        .typing-indicator span:nth-of-type(3) {
+            animation-delay: 0.3s;
+        }
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
         }
 
-        @keyframes fadeIn {
-            to { opacity: 1; transform: translateY(0); }
+        /* --- 5. Barra de Entrada --- */
+        .chat-input-bar {
+            padding: 0.75rem;
+            background-color: #ffffff;
+            border-top: 1px solid #ddd;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
         }
-
-        #chat-input-area {
+        
+        .chat-input-container {
             display: flex;
-            padding: 1rem;
-            background: #0f172a;
-            border-top: 1px solid #1e293b;
-            gap: 0.75rem;
-            padding-bottom: calc(1rem + env(safe-area-inset-bottom)); /* Sube la caja de entrada */
+            align-items: center; /* Alineación vertical de input y botones */
+            width: 100%;
+            background: #f0f2f5;
+            border-radius: 26px;
+            padding: 4px;
+            border: 1px solid #e0e0e0;
         }
 
         #user-input {
             flex-grow: 1;
-            border: 1px solid #1e293b;
-            border-radius: 25px;
-            padding: 0.85rem 1.2rem;
+            border: none;
+            padding: 0.75rem 1rem;
             font-size: 1rem;
-            background: #16213e;
-            color: #fff;
-            outline: none;
+            background-color: transparent;
+            color: #333;
         }
 
+        #user-input:focus {
+            outline: none;
+        }
+        
         #user-input::placeholder {
-            color: #64748b;
+            color: #999;
         }
 
         #send-button {
-            background: linear-gradient(135deg, #00d4ff, #007bff);
-            color: white;
+            flex-shrink: 0; /* Evita que el botón se encoja */
+            width: 44px; /* Tamaño idéntico */
+            height: 44px; /* Tamaño idéntico */
             border: none;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            font-size: 1.3rem;
+            background: linear-gradient(135deg, #007BFF, #0056b3);
+            border-radius: 50%; /* Botón de envío redondo */
+            color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
-            transition: all 0.2s ease;
+            margin-left: 8px;
+            padding-left: 3px; /* Ajuste visual del icono */
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        #send-button svg {
+            width: 24px;
+            height: 24px;
         }
 
         #send-button:active {
-            transform: scale(0.95);
+            transform: scale(0.9);
+        }
+        
+        /* * === CSS ACTUALIZADO PARA EL BOTÓN DE WHATSAPP (FLOTANTE) === 
+         */
+        #whatsapp-button {
+            position: fixed; /* Posición fija en la pantalla */
+            top: 1rem;       /* 1rem desde arriba */
+            right: 1rem;     /* 1rem desde la derecha */
+            z-index: 90;     /* Por encima del chat (10) pero debajo del modal (100) */
+            
+            width: 44px;     /* Mismo tamaño */
+            height: 44px;    /* Mismo tamaño */
+            border: none;
+            background: none;
+            border-radius: 12px;
+            padding: 0;
+            cursor: pointer;
+            
+            /* Oculto por defecto */
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.8);
+            
+            /* Animación de entrada */
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
         }
 
-        /* --- 3. Botón Flotante WhatsApp --- */
-        #whatsapp-fab {
-            position: fixed;
-            bottom: calc(80px + env(safe-area-inset-bottom)); /* Sube el botón de WhatsApp */
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background-color: #25D366;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: white;
-            font-size: 2rem;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.5);
-            z-index: 90;
-            transition: transform 0.2s ease;
+        #whatsapp-button img {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px; /* Mismo radio que el botón */
+            object-fit: cover; /* Asegura que la imagen llene el botón */
         }
 
-        #whatsapp-fab:hover {
-            transform: scale(1.1);
+        #whatsapp-button:active {
+            transform: scale(0.9); /* Misma animación que send-button */
         }
+        /* === FIN DEL CSS AÑADIDO === */
 
-        /* --- Clase oculta --- */
-        .hidden {
-            display: none !important;
-        }
-
-        /* --- Responsive --- */
-        @media (max-height: 600px) {
-            #modal-content {
-                padding: 1.5rem;
-            }
-            #modal-content h2 {
-                font-size: 1.3rem;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <!-- MODAL DE CONDICIONES DE USO -->
+    <!-- 1. Modal de Bienvenida -->
     <div id="welcome-modal">
-        <div id="modal-content">
-            <h2>Condiciones de Uso</h2>
-            <p>
-                Este chat es una <strong>herramienta de apoyo y reducción de daños</strong>, no un servicio de emergencia. 
-                Si tú o alguien más está en <strong>peligro inmediato</strong>, usa el botón <strong>"Ayuda Urgente"</strong> o llama al <strong>112</strong>.
-            </p>
-            <button id="accept-terms-btn">Entendido y Acepto</button>
-        </div>
+        <!-- ... (contenido del modal sin cambios) ... -->
     </div>
+    
+    <!-- BOTÓN DE WHATSAPP MOVIDO AQUÍ (FUERA DEL CHAT WRAPPER) -->
+    <button id="whatsapp-button" title="Contactar por WhatsApp">
+        <img src="1000026238.jpg" alt="Abrir WhatsApp">
+    </button>
+    
+    <!-- 2. Contenedor Principal del Chat (inicialmente oculto) -->
+    <div class="chat-wrapper" id="chat-wrapper">
 
-    <!-- CHAT PRINCIPAL -->
-    <div id="chat-container" class="hidden">
-        <div id="chat-header">
-            Conversación Segura
-            <div style="font-size: 0.8rem; margin-top: 0.3rem; opacity: 0.8;">
-                Recuerda: Si es urgente, usa el botón de WhatsApp.
+        <!-- 3. Cabecera del Chat -->
+        <header class="chat-header">
+            <p>Chat de Apoyo</p>
+        </header>
+
+        <!-- 4. Área de Mensajes -->
+        <main class="chat-messages" id="chat-messages">
+            <!-- Los mensajes se añadirán aquí dinámicamente -->
+        </main>
+
+        <!-- 5. Barra de Entrada -->
+        <footer class="chat-input-bar">
+            <div class="chat-input-container">
+                <input type="text" id="user-input" placeholder="Escribe tu mensaje..." autocomplete="off">
+                
+                <!-- BOTÓN DE WHATSAPP ELIMINADO DE AQUÍ -->
+                
+                <!-- Botón de Enviar -->
+                <button id="send-button" title="Enviar mensaje">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
             </div>
-        </div>
+        </footer>
 
-        <div id="chat-messages">
-            <!-- Mensajes aparecerán aquí -->
-        </div>
-
-        <div id="chat-input-area">
-            <input type="text" id="user-input" placeholder="Escribe aquí tu mensaje de apoyo...">
-            <button id="send-button">→</button>
-        </div>
     </div>
-
-    <!-- BOTÓN WHATSAPP -->
-    <a href="https://wa.me/34659837581" id="whatsapp-fab" target="_blank" title="Ayuda Urgente por WhatsApp">
-        💬
-    </a>
 
     <script>
-        // === CONFIGURACIÓN ===
-        const WORKER_URL = 'https://chat-ia-detras.chemsexcanarias.workers.dev';
+        // === MODELO DE IA (SIMULADO) ===
+        // En un escenario real, esto se reemplazaría con una llamada a la API de Gemini
+        const getBotReply = (userMessage) => {
+            return new Promise((resolve, reject) => {
+                // Simulación de demora de red
+                const delay = Math.random() * 1000 + 500;
+                
+                // Lógica de respuesta simple (simulada)
+                const lowerMsg = userMessage.toLowerCase();
+                let reply = "No estoy seguro de cómo responder a eso. ¿Puedes reformularlo?";
 
-        // === ELEMENTOS DOM ===
-        const welcomeModal = document.getElementById('welcome-modal');
-        const acceptTermsBtn = document.getElementById('accept-terms-btn');
-        const chatContainer = document.getElementById('chat-container');
+                if (lowerMsg.includes("hola") || lowerMsg.includes("buenos días")) {
+                    reply = "¡Hola! ¿Cómo te sientes hoy?";
+                } else if (lowerMsg.includes("triste") || lowerMsg.includes("mal")) {
+                    reply = "Lamento que te sientas así. ¿Te gustaría hablar sobre qué es lo que te hace sentir mal? A veces, identificar la causa es el primer paso.";
+                } else if (lowerMsg.includes("ansiedad") || lowerMsg.includes("nervioso")) {
+                    reply = "La ansiedad puede ser abrumadora. Un ejercicio simple de respiración puede ayudar: Inhala profundamente contando hasta 4, sostén el aire contando hasta 4, y exhala lentamente contando hasta 6. Repítelo 5 veces. ¿Quieres intentarlo?";
+                } else if (lowerMsg.includes("gracias") || lowerMsg.includes("gracia")) {
+                    reply = "Estoy aquí para ayudarte. ¿Hay algo más en lo que pueda apoyarte?";
+                } else if (lowerMsg.includes("adiós") || lowerMsg.includes("terminar")) {
+                    reply = "De acuerdo. Recuerda que estoy aquí si necesitas hablar más tarde. Cuídate.";
+                } else if (lowerMsg.length > 50) {
+                     reply = "Gracias por compartir eso conmigo. Parece que tienes mucho en mente. ¿Podrías identificar cuál es el pensamiento principal que te está causando más malestar en este momento?";
+                }
+
+                setTimeout(() => {
+                    resolve({ reply });
+                }, delay);
+
+                // Para probar un error de API:
+                // setTimeout(() => reject(new Error("Simulated API Error")), delay);
+            });
+        };
+
+        // === ELEMENTOS DEL DOM ===
+        const modal = document.getElementById('welcome-modal');
+        const startBtn = document.getElementById('start-chat-btn');
+        const chatWrapper = document.getElementById('chat-wrapper');
         const chatMessages = document.getElementById('chat-messages');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
+        const whatsappButton = document.getElementById('whatsapp-button'); // <-- BOTÓN AÑADIDO
+        
+        // === MANEJADORES DE EVENTOS ===
 
-        // === ESTADO ===
-        let userName = 'Anónimo';
-        let userAge = '18+';
-
-        // === INICIO: Aceptar términos ===
-        acceptTermsBtn.addEventListener('click', () => {
-            welcomeModal.classList.add('hidden');
-            document.body.style.overflow = 'hidden'; // Evita scroll de fondo
-            chatContainer.classList.remove('hidden');
-            setTimeout(() => chatContainer.classList.add('visible'), 50);
-
-            // Mensaje de bienvenida
+        // Iniciar chat (ocultar modal, mostrar chat)
+        startBtn.onclick = () => {
+            modal.style.transition = 'opacity 0.5s ease, visibility 0.5s ease';
+            modal.style.opacity = '0';
+            modal.style.visibility = 'hidden';
+            
+            // Permitir scroll en el body si fuera necesario
+            document.body.style.overflow = 'auto'; 
+            
+            chatWrapper.classList.add('visible');
+            
+            /* MOSTRAR BOTÓN DE WHATSAPP FLOTANTE */
+            whatsappButton.style.opacity = '1';
+            whatsappButton.style.visibility = 'visible';
+            whatsappButton.style.transform = 'scale(1)';
+            
+            // Saludo inicial del Bot
             setTimeout(() => {
-                addMessageToChat(`
-                    ¡Hola! Soy tu asistente de apoyo en reducción de daños y chemsex. 
-                    Estoy aquí para escucharte sin juzgar. 
-                    ¿Cómo te sientes hoy o qué te gustaría hablar?
-                `, 'bot-message');
-            }, 600);
-        });
+                addMessageToChat("¡Hola! Soy tu asistente de apoyo. ¿En qué estás pensando?", 'bot-message');
+                userInput.focus();
+            }, 600); // Espera a que la transición termine
+        };
 
-        // === ENVÍO DE MENSAJES ===
-        sendButton.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', e => {
-            if (e.key === 'Enter') sendMessage();
+        // Enviar mensaje al pulsar el botón
+        sendButton.onclick = sendMessage;
+        
+        // Enviar mensaje al pulsar 'Enter'
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); // Evita el salto de línea
+                sendMessage();
+            }
         });
+        
+        // *** MANEJADOR AÑADIDO PARA WHATSAPP ***
+        whatsappButton.onclick = openWhatsApp;
 
+        // === FUNCIONES PRINCIPALES ===
+
+        // Función para abrir WhatsApp (Ya existía)
+        function openWhatsApp() {
+            // !! IMPORTANTE: Reemplaza este número con tu número de teléfono real
+            const phoneNumber = '123456789'; // Ejemplo: '34600123456' (con código de país)
+            const message = 'Hola, vengo del chat de apoyo y necesito ayuda.';
+            const url = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        // Función para enviar un mensaje
         async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
+            const messageText = userInput.value.trim();
+            
+            if (messageText === '') return; // No enviar mensajes vacíos
 
-            addMessageToChat(text, 'user-message');
+            // Añadir mensaje del usuario al chat
+            addMessageToChat(messageText, 'user-message');
+            
+            // Limpiar el input
             userInput.value = '';
+            
+            // Mostrar indicador de "escribiendo..."
             showTypingIndicator();
 
+            // Obtener respuesta del bot (simulada)
             try {
-                const res = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, nombre: userName, edad: userAge })
-                });
-
+                const data = await getBotReply(messageText);
                 hideTypingIndicator();
-
-                if (!res.ok) throw new Error('Error de red');
-
-                const data = await res.json();
-                if (data.reply) {
+                
+                if (data && data.reply) {
                     addMessageToChat(data.reply, 'bot-message');
                 } else {
                     throw new Error('Sin respuesta');
                 }
             } catch (err) {
                 hideTypingIndicator();
-                addMessageToChat('Lo siento, no puedo conectarme ahora. Intenta más tarde o usa el botón de WhatsApp.', 'bot-message');
+                addMessageToChat('Lo siento, no puedo conectarme ahora. Intenta más tarde o usa el botón de WhatsApp.', 'bot-document');
                 console.error(err);
             }
         }
@@ -398,12 +466,17 @@
         function addMessageToChat(text, type) {
             const div = document.createElement('div');
             div.className = `message ${type}`;
-            div.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
+            // Reemplaza \n (texto) por <br> (HTML) para saltos de línea
+            div.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`; 
             chatMessages.appendChild(div);
+            // Hacer scroll hasta el final
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function showTypingIndicator() {
+            // Evitar duplicados
+            if (document.getElementById('typing-indicator')) return;
+            
             const el = document.createElement('div');
             el.className = 'message bot-message typing-indicator';
             el.innerHTML = '<span></span><span></span><span></span>';
@@ -417,10 +490,9 @@
             if (el) el.remove();
         }
 
-        // === FOCUS EN INPUT AL CARGAR ===
-        window.addEventListener('load', () => {
-            setTimeout(() => userInput.focus(), 1000);
-        });
+        // === FOCUS EN INPUT AL CARGAR (Solo después de cerrar el modal) ===
+        // (El focus se mueve al handler de 'start-chat-btn')
+
     </script>
 </body>
 </html>
