@@ -64,7 +64,7 @@
         .main-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: center; /* Esto centra verticalmente todos los elementos */
             width: 100%;
             margin-bottom: 1rem; /* Espacio entre header y slogan */
             gap: 10px; /* Espacio entre los logos y el botón */
@@ -74,17 +74,17 @@
         .header-logo {
             width: 70px; /* Tamaño reducido */
             height: 70px;
-            object-fit: contain; /* Para asegurar que la imagen 'diversas' no se deforme */
+            object-fit: contain; 
             flex-shrink: 0; /* Evita que el logo pequeño se encoja */
         }
 
-        /* --- CLASE AÑADIDA PARA EL LOGO DE DIVERSAS --- */
+        /* --- CLASE AJUSTADA PARA EL LOGO DE DIVERSAS --- */
         .logo-diversas {
-            width: 270px;  /* Ajustado de 300px para que quepa */
-            height: 135px; /* Mantiene la proporción 2:1 */
+            width: 140px;  /* Ajustado para mantener proporción 2:1 */
+            height: 70px; /* Igualado al .header-logo para alineación perfecta */
             object-fit: contain;
-            flex-shrink: 1; /* Permite que se encoja si es necesario en pantallas muy pequeñas */
-            margin: 0 auto; /* Ayuda a centrarlo si hay espacio extra */
+            flex-shrink: 1; /* Permite que se encoja si es necesario */
+            margin: 0 auto; /* Lo centra en el espacio sobrante */
         }
 
 
