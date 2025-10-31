@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info Sustancias - @BajadaSegura</title>
+    
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fuente Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILOS NEÓN (Copiados de index.html) --- */
+        :root {
+            --neon-pink: #FF00FF;
+            --neon-red: #FF3300;
+            --neon-blue: #00FFFF;
+            --neon-green: #39FF14;
+            --neon-purple: #9D00FF;
+            --font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #000000;
+            color: #f0f0f0;
+            font-family: var(--font-family);
+            min-height: 100vh;
+            padding-top: 5vh;
+            padding-bottom: 5vh;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Textura de ruido */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            z-index: 100;
+        }
+
+        /* Contenedor principal */
+        .main-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Slogan */
+        .slogan {
+            font-weight: 300;
+            font-size: 1.125rem;
+            line-height: 1.6;
+        }
+
+        /* Botón Neón Base */
+        .btn-neon {
+            display: inline-block;
+            width: 100%;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 2px solid var(--color-neon);
+            color: var(--color-neon);
+            background-color: rgba(10, 10, 10, 0.3);
+            border-radius: 0.75rem;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 0 5px var(--color-neon), 0 0 10px var(--color-neon) inset;
+            text-decoration: none; /* Para los tags <a> */
+        }
+        .btn-neon:hover {
+            background-color: var(--color-neon);
+            color: #000000;
+            box-shadow: 0 0 15px var(--color-neon), 0 0 30px var(--color-neon);
+        }
+        
+        /* Colores de Botones */
+        .btn-pink { --color-neon: var(--neon-pink); }
+        .btn-red { --color-neon: var(--neon-red); }
+        .btn-blue { --color-neon: var(--neon-blue); }
+        .btn-purple { --color-neon: var(--neon-purple); }
+
+        /* --- NUEVOS ESTILOS (Acordeón de Info) --- */
+        
+        /* Botón del acordeón (ligeramente más pequeño) */
+        .accordion-btn {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            text-align: left;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        /* Flecha indicadora */
+        .accordion-btn::after {
+            content: '▼';
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%) scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        /* Flecha cuando está activo/abierto */
+        .accordion-btn.active::after {
+            transform: translateY(-50%) scale(0.8) rotate(180deg);
+        }
+
+        /* Contenido del acordeón */
+        .info-content {
+            background-color: rgba(10, 10, 10, 0.5);
+            border: 1px solid var(--neon-blue);
+            color: #f0f0f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: -0.5rem; /* Solapa ligeramente con el botón */
+            margin-bottom: 1rem;
+            line-height: 1.7;
+            box-shadow: 0 0 10px var(--neon-blue) inset;
+        }
+        .info-content h3 {
+            color: var(--neon-pink);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+        .info-content p {
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        .info-content ul {
+            list-style-type: disc;
+            margin-left: 1.25rem;
+            font-size: 0.95rem;
+        }
+        .info-content li {
+            margin-bottom: 0.5rem;
+        }
+        /* Advertencia especial */
+        .warning-box {
+            background-color: rgba(255, 51, 0, 0.1);
+            border: 1px solid var(--neon-red);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+        .warning-box strong {
+            color: var(--neon-red);
+        }
+    </style>
+</head>
+<body class="bg-black">
+
+    <div class="main-container">
+
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-center mb-2" style="color: var(--neon-pink);">
+                INFO SUSTANCIAS
+            </h1>
+            <p class="slogan text-center text-gray-200">
+                Información clave para la reducción de riesgos.
+            </p>
+        </header>
+
+        <div id="infoContainer" class="space-y-2">
+
+            <!-- 1. Metanfetamina -->
+            <button class="accordion-btn btn-neon btn-blue" data-target="info-meta">
+                Metanfetamina (Tina, Crystal)
+            </button>
+            <div id="info-meta" class="info-content hidden">
+                <h3>Riesgos Principales</h3>
+                <ul>
+                    <li>Alto potencial de adicción y dependencia.</li>
+                    <li>Ansiedad, paranoia y riesgo de psicosis temporal.</li>
+                    <li>Aumento de la presión arterial y riesgo cardiovascular.</li>
+                    <li>Daño a mucosas (al esnifar) o venas (al inyectar).</li>
+                    <li>Bajones ("crash") intensos de energía y ánimo.</li>
+                </ul>
+                <h3 class="mt-4">Reducción de Riesgos</h3>
+                <ul>
+                    <li>Empezar con dosis muy bajas ("microdosis") para probar la potencia.</li>
+                    <li>Mantenerse hidratado (agua o bebidas isotónicas), aunque no tengas sed.</li>
+                    <li>Descansar y dormir. El cuerpo necesita recuperarse.</li>
+                    <li>Evitar mezclar con otros estimulantes (cocaína, mefedrona).</li>
+                    <li>Si se esnifa, pulverizar bien el cristal y alternar fosas nasales.</li>
+                </ul>
+            </div>
+
+            <!-- 2. Mefedrona -->
+            <button class="accordion-btn btn-neon btn-blue" data-target="info-mefe">
+                Mefedrona (Mefe, Miau Miau)
+            </button>
+            <div id="info-mefe" class="info-content hidden">
+                <h3>Riesgos Principales</h3>
+                <ul>
+                    <li>Fuerte compulsión por redosificar, aumentando el riesgo de sobredosis.</li>
+                    <li>Taquicardia, palpitaciones y aumento de la temperatura corporal.</li>
+                    <li>Ansiedad, paranoia y bruxismo (apretar la mandíbula).</li>
+                    <li>Vasoconstricción (dedos y labios azulados).</li>
+                    <li>Potencial daño al corazón con uso continuado.</li>
+                </ul>
+                <h3 class="mt-4">Reducción de Riesgos</h3>
+                <ul>
+                    <li>Pesar las dosis con precisión. No redosificar "a ojo".</li>
+                    <li>Establecer un límite de cantidad y tiempo antes de empezar.</li>
+                    <li>Beber agua, pero no en exceso (riesgo de hiponatremia).</li>
+                    <li>Descansar en lugares frescos si se siente mucho calor.</li>
+                    <li>Evitar mezclar con alcohol u otros estimulantes.</li>
+                </ul>
+            </div>
+
+            <!-- 3. GHB / GBL -->
+            <button class="accordion-btn btn-neon btn-blue" data-target="info-ghb">
+                GHB / GBL (G, Éxtasis líquido)
+            </button>
+            <div id="info-ghb" class="info-content hidden">
+                <h3>Riesgos Principales</h3>
+                <ul>
+                    <li>Riesgo MUY ALTO de sobredosis. La diferencia entre la dosis deseada y la dosis peligrosa es mínima.</li>
+                    <li>Pérdida de conocimiento ("irse", "G-hole").</li>
+                    <li>Depresión respiratoria (respiración lenta o parada).</li>
+                    <li>Riesgo de dependencia física con síndrome de abstinencia grave.</li>
+                </ul>
+                <div class="warning-box">
+                    <strong>¡ADVERTENCIA MORTAL!</strong><br>
+                    Nunca, bajo ninguna circunstancia, mezclar GHB/GBL con ALCOHOL o KETAMINA. Esta mezcla potencia la depresión respiratoria y es una causa común de muerte.
+                </div>
+                <h3 class="mt-4">Reducción de Riesgos</h3>
+                <ul>
+                    <li>Medir SIEMPRE la dosis con una jeringuilla (en ml). Nunca usar tapones o "chorritos".</li>
+                    <li>Anotar la hora de cada toma para evitar redosificar antes de tiempo (esperar al menos 2 horas).</li>
+                    <li>Si se toma GBL, usar dosis más bajas que con GHB (es más potente).</li>
+                    <li>Hacerlo siempre en compañía de alguien que sepa qué se ha tomado.</li>
+                    <li>Si alguien pierde el conocimiento, ponerlo en posición lateral de seguridad y llamar a emergencias (112).</li>
+                </ul>
+            </div>
+
+            <!-- 4. Otras Sustancias -->
+            <button class="accordion-btn btn-neon btn-blue" data-target="info-otras">
+                Otras (Poppers, Ketamina)
+            </button>
+            <div id="info-otras" class="info-content hidden">
+                <h3>Poppers (Nitritos de alquilo)</h3>
+                <p>Usados para relajar esfínteres y potenciar orgasmos.</p>
+                <ul>
+                    <li>Riesgos: Bajada brusca de tensión, mareos, dolor de cabeza.</li>
+                    <li><strong>Advertencia:</strong> No mezclar NUNCA con Viagra, Cialis u otras drogas para la disfunción eréctil. Puede causar una bajada de tensión mortal.</li>
+                    <li>Reducción de riesgos: No ingerir (es tóxico), evitar contacto con la piel (quema), usar en espacios ventilados.</li>
+                </ul>
+                
+                <h3 class="mt-4">Ketamina (Keta, K)</h3>
+                <p>Usada por sus efectos disociativos.</p>
+                <ul>
+                    <li>Riesgos: Pérdida de movilidad ("K-hole"), desorientación, riesgo de accidentes.</li>
+                    <li><strong>Advertencia:</strong> Evitar mezclar con GHB o Alcohol (aumenta riesgo de depresión respiratoria).</li>
+                    <li>Reducción de riesgos: Dosis muy bajas, empezar poco a poco. Hacerlo en un entorno seguro y tumbado.</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Botón Volver al Inicio -->
+        <a href="index.html" class="btn-neon btn-purple w-full mt-6" style="margin-bottom: 0;">
+            &larr; Volver al Inicio
+        </a>
+
+    </div>
+
+    <script>
+        // Script simple para el acordeón
+        window.onload = () => {
+            const buttons = document.querySelectorAll('.accordion-btn');
+            
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.getAttribute('data-target');
+                    const targetContent = document.getElementById(targetId);
+                    
+                    // Alternar clase 'active' en el botón
+                    button.classList.toggle('active');
+                    
+                    // Alternar clase 'hidden' en el contenido
+                    if (targetContent) {
+                        targetContent.classList.toggle('hidden');
+                    }
+                    
+                    // Opcional: cerrar otros acordeones al abrir uno
+                    buttons.forEach(otherButton => {
+                        if (otherButton !== button) {
+                            otherButton.classList.remove('active');
+                            const otherTargetId = otherButton.getAttribute('data-target');
+                            const otherTargetContent = document.getElementById(otherTargetId);
+                            if (otherTargetContent) {
+                                otherTargetContent.classList.add('hidden');
+                            }
+                        }
+                    });
+                });
+            });
+        };
+    </script>
+</body>
+</html>
+
+
