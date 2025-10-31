@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiénes Somos - BajadaSegura</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Definición de colores neón (igual que en index.html) */
+        :root {
+            --neon-pink: #FF00FF;
+            --neon-red: #FF3300;
+            --neon-blue: #00FFFF;
+            --neon-green: #39FF14;
+            --neon-purple: #9D00FF;
+            --font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #000000;
+            color: #f0f0f0;
+            font-family: var(--font-family);
+            min-height: 100vh;
+            padding-top: 1.5rem;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Textura de ruido (igual que en index.html) */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            z-index: 100;
+        }
+
+        /* Contenedor principal */
+        .main-container {
+            width: 100%;
+            max-width: 450px; /* Ancho de app nativa */
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Botón de Volver (estilo neón sutil) */
+        .btn-back {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-decoration: none;
+            border: 2px solid var(--neon-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px var(--neon-blue), 
+                        0 0 10px var(--neon-blue) inset;
+        }
+
+        .btn-back:hover {
+            background-color: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        /* Título de la sección */
+        .section-title {
+            font-size: 2.5rem; /* 40px */
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            /* Sutil brillo de texto neón */
+            text-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        /* Párrafos de texto didáctico */
+        .content-text {
+            font-size: 1rem; /* 16px */
+            font-weight: 300;
+            line-height: 1.7;
+            color: #e0e0e0; /* Un gris un poco más suave */
+            margin-bottom: 1.5rem;
+        }
+
+    </style>
+</head>
+<body class="bg-black">
+
+    <div class="main-container">
+        
+        <!-- Botón para regresar a la página principal -->
+        <a href="index.html" class="btn-back">
+            &larr; Volver
+        </a>
+
+        <!-- Contenido de la página -->
+        <h1 class="section-title">
+            Quiénes Somos
+        </h1>
+
+        <p class="content-text">
+            BajadaSegura es una iniciativa sin ánimo de lucro dedicada a la reducción de daños y al apoyo en la comunidad relacionada con el chemsex. 
+            Nuestra misión es proporcionar información veraz, accesible y libre de juicios.
+        </p>
+        
+        <p class="content-text">
+            Entendemos que el chemsex es una realidad compleja que requiere un enfoque empático y basado en la evidencia científica. No estamos aquí para juzgar, sino para acompañar y ofrecer herramientas que permitan a cada individuo tomar decisiones informadas sobre su salud y bienestar.
+        </p>
+        
+        <p class="content-text">
+            Este proyecto nace de la necesidad de crear un espacio seguro donde se pueda hablar abiertamente, encontrar recursos de emergencia y conectar con profesionales y grupos de apoyo. Creemos firmemente en el poder de la comunidad y en el derecho a la información.
+        </p>
+
+    </div>
+
+</body>
+</html>
+
