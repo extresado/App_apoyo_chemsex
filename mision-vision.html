@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Título principal de la página (importante para SEO) -->
+    <title>Misión y Visión - Bajada Segura</title>
+
+    <!-- 
+    =================================================================
+    METADATOS DE OPEN GRAPH (OG) - Para WhatsApp, Facebook, LinkedIn, etc.
+    =================================================================
+    -->
+    <meta property="og:title" content="Nuestra Misión y Visión - Proyecto Bajada Segura" />
+    <meta property="og:type" content="website" />
+    <!-- URL canónica de ESTA página específica -->
+    <meta property="og:url" content="https://bajadasegura.info/mision-vision.html" />
+    <!-- Imagen de vista previa (Usando la misma que el index) -->
+    <meta property="og:image" content="https://placehold.co/1200x630/D9008C/FFFFFF?text=Bajada+Segura" />
+    <!-- Descripción de ESTA página -->
+    <meta property="og:description" content="Conoce la misión, visión y valores de Bajada Segura. Trabajamos desde la empatía, la reducción de daños y libres de juicio." />
+    <meta property="og:site_name" content="Bajada Segura" />
+    <meta property="og:locale" content="es_ES" />
+
+    <!-- 
+    =================================================================
+    METADATOS DE TWITTER CARD (Para cuando se comparte en Twitter/X)
+    =================================================================
+    -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://bajadasegura.info/mision-vision.html">
+    <meta name="twitter:title" content="Nuestra Misión y Visión - Proyecto Bajada Segura">
+    <meta name="twitter:description" content="Conoce la misión, visión y valores de Bajada Segura. Trabajamos desde la empatía, la reducción de daños y libres de juicio.">
+    <!-- Imagen de vista previa (Usando la misma que el index) -->
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/extresado/App_apoyo_chemsex/main/1000025194.png">
+
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos de index.html (copiados para coherencia) -->
+    <style>
+        :root {
+            --neon-pink: #FF00FF;
+            --neon-red: #FF3300;
+            --neon-blue: #00FFFF;
+            --neon-green: #39FF14;
+            --neon-purple: #9D00FF;
+            --font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #000000;
+            color: #f0f0f0;
+            font-family: var(--font-family);
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding-top: 1.5rem;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            z-index: 100;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 1rem;
+            gap: 10px;
+        }
+
+        .header-logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain; 
+            flex-shrink: 0;
+        }
+
+        .logo-diversas {
+            width: 140px;
+            height: 70px;
+            object-fit: contain;
+            flex-shrink: 1;
+            margin: 0 auto;
+        }
+
+        .hamburger-icon {
+            width: 40px;
+            height: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            z-index: 1001;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .hamburger-icon .bar {
+            width: 100%;
+            height: 6px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        body.menu-open .hamburger-icon .bar:nth-child(1) {
+            transform: translateY(12px) rotate(45deg);
+        }
+        body.menu-open .hamburger-icon .bar:nth-child(2) {
+            opacity: 0;
+        }
+        body.menu-open .hamburger-icon .bar:nth-child(3) {
+            transform: translateY(-12px) rotate(-45deg);
+        }
+
+        #overlay-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transform: translateY(-100%);
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.5s ease, opacity 0.5s ease, visibility 0.5s;
+        }
+
+        body.menu-open #overlay-menu {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #overlay-menu nav {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        #overlay-menu .menu-link {
+            font-family: var(--font-family);
+            font-size: 2.25rem; /* 36px */
+            font-weight: 700;
+            color: #f0f0f0;
+            text-decoration: none;
+            margin: 1.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        #overlay-menu .menu-link:hover {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        #overlay-menu .menu-footer-logo {
+            position: absolute;
+            bottom: 2rem;
+            width: 80px;
+            height: 80px;
+            opacity: 0.5;
+        }
+
+        #close-menu-btn {
+            position: absolute;
+            bottom: 2rem;
+            right: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            background: none;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1002;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        #close-menu-btn:hover {
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Estilos para la página de contenido */
+        .content-page h1 {
+            font-size: 2rem; /* 32px */
+            font-weight: 700;
+            color: var(--neon-pink);
+            text-shadow: 0 0 8px var(--neon-pink);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .content-page h2 {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
+            margin-bottom: 0.75rem;
+            margin-top: 2rem;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--neon-blue);
+        }
+
+        /* Colores específicos para cada sección */
+        .content-page #vision h2 { color: var(--neon-green); border-bottom-color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
+        .content-page #values h2 { color: var(--neon-purple); border-bottom-color: var(--neon-purple); text-shadow: 0 0 5px var(--neon-purple); }
+
+
+        .content-page p {
+            color: #d1d5db; /* gray-300 */
+            font-size: 0.95rem; /* 15px */
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .content-page ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 1.25rem; /* space-y-5 */
+        }
+        
+        .content-page ul li {
+            color: #d1d5db; /* gray-300 */
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.25rem; /* Equivalente a space-y-5 en el padre */
+        }
+
+        .content-page ul li strong {
+            font-weight: 700;
+            color: #f0f0f0; /* Blanco */
+            display: block; /* El título del valor en su propia línea */
+            margin-bottom: 0.25rem;
+        }
+
+    </style>
+</head>
+<body class="bg-black">
+
+    <!-- --- MENÚ OVERLAY (Oculto por defecto) --- -->
+    <div id="overlay-menu">
+        <nav>
+            <!-- Enlaces actualizados para la navegación del sitio -->
+            <a href="index.html" class="menu-link">Inicio</a>
+            <a href="mision-vision.html" class="menu-link">Quiénes Somos</a>
+            <a href="#" class="menu-link">Prensa</a>
+            <a href="#" class="menu-link">Contacto</a>
+        </nav>
+        
+        <img src="https://raw.githubusercontent.com/extresado/App_apoyo_chemsex/main/1000025194.png" alt="Logo BajadaSegura" class="menu-footer-logo">
+
+        <button id="close-menu-btn" aria-label="Cerrar menú">X</button>
+    </div>
+
+
+    <!-- --- CONTENIDO PRINCIPAL --- -->
+    <div class="main-container">
+        
+        <!-- Cabecera (Idéntica a index.html) -->
+        <header class="main-header">
+            <img src="https://raw.githubusercontent.com/extresado/App_apoyo_chemsex/main/1000025194.png" alt="Logo BajadaSegura" class="header-logo">
+            <img src="diversas.png" alt="Logo Diversas Canarias" class="logo-diversas" onerror="this.style.display='none'"> <!-- Fallback por si no carga diversas.png -->
+            <button id="menu-btn" class="hamburger-icon" aria-label="Abrir menú">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </header>
+
+        <!-- Contenido de la página Misión/Visión -->
+        <main class="content-page mt-4">
+            
+            <h1>Nuestra Razón de Ser</h1>
+
+            <section id="mission">
+                <h2>🧭 Nuestra Misión</h2>
+                <p>
+                    Nuestra misión es <strong>acompañar</strong> a hombres gais, bisexuales, otros hombres que tienen sexo con hombres (GBHSH) y a cualquier persona de la comunidad LGTBQ+ que practique el chemsex.
+                </p>
+                <p>
+                    Lo hacemos creando <strong>espacios de confianza digitales, seguros y libres de juicio</strong> en las plataformas que ya utilizan. Ofrecemos información veraz y accesible sobre reducción de daños, salud sexual y salud mental, con el objetivo de <strong>reducir el aislamiento</strong>, derribar el estigma y <strong>empoderar al usuario</strong> para que tome decisiones informadas sobre su bienestar y su placer.
+                </p>
+            </section>
+
+            <section id="vision">
+                <h2>🔭 Nuestra Visión</h2>
+                <p>
+                    Aspiramos a una comunidad LGTBQ+ donde el chemsex y el uso de sustancias en contextos sexuales puedan abordarse <strong>abiertamente, sin estigma ni culpa</strong>.
+                </p>
+                <p>
+                    Nuestra visión es un futuro en el que cada individuo tenga acceso inmediato a <strong>información de calidad sobre reducción de riesgos</strong> y a una red de <strong>apoyo comunitario y profesional</strong> que valide sus experiencias. Soñamos con un entorno donde la salud (física, mental y sexual) sea una prioridad accesible para todos, y nadie tenga que enfrentar la soledad o la desinformación en momentos de vulnerabilidad.
+                </p>
+            </section>
+
+            <section id="values" class="pb-16"> <!-- Padding-bottom para dejar espacio al final -->
+                <h2>❤️ Nuestros Valores</h2>
+                <ul>
+                    <li>
+                        <strong>Reducción de Daños y Riesgos</strong>
+                        Creemos en conocer al usuario "donde está". No imponemos la abstinencia como única meta. Proporcionamos herramientas prácticas para gestionar el consumo, minimizar riesgos (como el <i>slamming</i> o las mezclas peligrosas) y aumentar el placer de forma más segura.
+                    </li>
+                    <li>
+                        <strong>Libre de Juicio (Non-Judgmental)</strong>
+                        No estamos aquí para juzgar, moralizar o patologizar. Escuchamos, validamos y ofrecemos información. Entendemos que el chemsex está vinculado a la búsqueda de placer, conexión, intimidad o la gestión de emociones difíciles.
+                    </li>
+                    <li>
+                        <strong>Afirmación LGTBQ+</strong>
+                        Entendemos el chemsex como un fenómeno intrínsecamente ligado a la cultura sexual gay y LGTBQ+. Comprendemos el impacto del "estrés de las minorías", la homofobia interiorizada y el estigma (como la serofobia) como factores que pueden influir en el consumo.
+                    </li>
+                    <li>
+                        <strong>Confidencialidad y Seguridad</strong>
+                        La confianza es la base de nuestro proyecto. Garantizamos un entorno digital seguro donde las conversaciones son confidenciales. Somos conscientes de los riesgos legales y sociales asociados al consumo de sustancias y protegemos la identidad de nuestros usuarios.
+                    </li>
+                    <li>
+                        <strong>Base en la Evidencia</strong>
+                        La información que proporcionamos no se basa en opiniones, sino en la evidencia científica y la experiencia clínica. Utilizamos guías y documentos técnicos de referencia para asegurar que nuestros consejos sobre sustancias, interacciones (incluyendo TAR) y salud mental sean precisos y actualizados.
+                    </li>
+                    <li>
+                        <strong>Empatía y Acompañamiento</strong>
+                        No eres un "caso", eres una persona. Usamos la entrevista motivacional como herramienta clave. Estamos aquí para escuchar y ayudarte a encontrar <i>tus propias</i> razones para el cambio, sea cual sea el cambio que decidas hacer.
+                    </li>
+                </ul>
+            </section>
+            
+        </main>
+
+    </div>
+
+    <!-- Script del Menú (Idéntico a index.html) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuBtn = document.getElementById('menu-btn');
+            const closeMenuBtn = document.getElementById('close-menu-btn');
+            const menuLinks = document.querySelectorAll('#overlay-menu .menu-link');
+
+            function toggleMenu() {
+                document.body.classList.toggle('menu-open');
+            }
+
+            function closeMenu() {
+                document.body.classList.remove('menu-open');
+            }
+
+            menuBtn.addEventListener('click', toggleMenu);
+            closeMenuBtn.addEventListener('click', closeMenu);
+            menuLinks.forEach(link => {
+                link.addEventListener('click', closeMenu);
+            });
+        });
+    </script>
+
+</body>
+</html>
