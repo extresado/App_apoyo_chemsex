@@ -73,6 +73,7 @@
         .header-logo {
             width: 70px; /* Tamaño reducido */
             height: 70px;
+            object-fit: contain; /* Para asegurar que la imagen 'diversas' no se deforme */
         }
 
         /* --- BOTÓN MENÚ HAMBURGUESA --- */
@@ -255,7 +256,8 @@
 </head>
 <body class="bg-black">
 
-    <!-- --- MENÚ OVERLAY (Oculto por defecto) --- --><div id="overlay-menu">
+    <!-- --- MENÚ OVERLAY (Oculto por defecto) --- -->
+    <div id="overlay-menu">
         <nav>
             <a href="quienes-somos.html" class="menu-link">Quiénes Somos</a>
             <a href="#" class="menu-link">Misión y Visión</a>
@@ -265,27 +267,37 @@
         
         <img src="https://raw.githubusercontent.com/extresado/App_apoyo_chemsex/main/1000025194.png" alt="Logo BajadaSegura" class="menu-footer-logo">
 
-        <!-- NUEVO BOTÓN 'X' PARA CERRAR EL MENÚ --><button id="close-menu-btn" aria-label="Cerrar menú">X</button>
+        <!-- NUEVO BOTÓN 'X' PARA CERRAR EL MENÚ -->
+        <button id="close-menu-btn" aria-label="Cerrar menú">X</button>
     </div>
 
 
-    <!-- --- CONTENIDO PRINCIPAL --- --><div class="main-container">
+    <!-- --- CONTENIDO PRINCIPAL --- -->
+    <div class="main-container">
         
-        <!-- Nueva cabecera flexible --><header class="main-header">
-            <!-- Logo a la izquierda --><img src="https://raw.githubusercontent.com/extresado/App_apoyo_chemsex/main/1000025194.png" alt="Logo BajadaSegura" class="header-logo">
+        <!-- Nueva cabecera flexible -->
+        <header class="main-header">
+            <!-- Logo a la izquierda -->
+            <img src="https://raw.githubusercontent.com/extresado/App_apoyo_chemsex/main/1000025194.png" alt="Logo BajadaSegura" class="header-logo">
             
-            <!-- Botón Hamburguesa a la derecha --><button id="menu-btn" class="hamburger-icon" aria-label="Abrir menú">
+            <!-- Imagen Diversas (Añadida) -->
+            <img src="diversas.png" alt="Logo Diversas Canarias" class="header-logo">
+
+            <!-- Botón Hamburguesa a la derecha -->
+            <button id="menu-btn" class="hamburger-icon" aria-label="Abrir menú">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
             </button>
         </header>
 
-        <!-- Slogan (centrado) --><p class="slogan text-center text-gray-200 mt-2 mb-6">
+        <!-- Slogan (centrado) -->
+        <p class="slogan text-center text-gray-200 mt-2 mb-6">
             Estás acompañado. Hablemos de chemsex sin juicios.
         </p>
 
-        <!-- Botones de navegación principal (sin cambios) --><nav class="flex flex-col items-center">
+        <!-- Botones de navegación principal (sin cambios) -->
+        <nav class="flex flex-col items-center">
             
             <a href="formulario.html" class="btn-neon btn-pink">
                 <span class="btn-text">¿DÓNDE ESTÁS?</span>
@@ -311,7 +323,8 @@
 
     </div>
 
-    <!-- --- SCRIPT PARA EL MENÚ (ACTUALIZADO) --- --><script>
+    <!-- --- SCRIPT PARA EL MENÚ (ACTUALIZADO) --- -->
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             const menuBtn = document.getElementById('menu-btn'); // Botón hamburguesa
             const closeMenuBtn = document.getElementById('close-menu-btn'); // Nuevo botón 'X'
