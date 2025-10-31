@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info-Check - BajadaSegura.info</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Definición de colores neón (Copiados de index.html) */
+        :root {
+            --neon-pink: #FF00FF;
+            --neon-red: #FF3300;
+            --neon-blue: #00FFFF;
+            --neon-green: #39FF14;
+            --neon-purple: #9D00FF;
+            --font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #000000;
+            color: #f0f0f0;
+            font-family: var(--font-family);
+            display: flex;
+            align-items: flex-start; /* Alinea al inicio */
+            justify-content: center;
+            min-height: 100vh;
+            padding-top: 5vh;
+            padding-bottom: 5vh; /* Espacio inferior */
+            box-sizing: border-box;
+            overflow-y: auto; /* Permite scroll */
+            position: relative;
+        }
+
+        /* Textura de ruido (Copiada de index.html) */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            z-index: -1; /* Detrás del contenido */
+        }
+
+        /* Contenedor principal (Copiado de index.html) */
+        .main-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Estilo base del botón (Copiado de index.html) */
+        .btn-neon {
+            display: block;
+            width: 100%;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--color-neon);
+            color: var(--color-neon);
+            background-color: rgba(10, 10, 10, 0.3);
+            border-radius: 0.75rem;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 0 5px var(--color-neon), 0 0 10px var(--color-neon) inset;
+        }
+
+        .btn-neon:hover {
+            background-color: var(--color-neon);
+            color: #000000;
+            box-shadow: 0 0 15px var(--color-neon), 0 0 30px var(--color-neon);
+        }
+        
+        /* Clases de color (Copiadas de index.html) */
+        .btn-pink { --color-neon: var(--neon-pink); }
+        .btn-red { --color-neon: var(--neon-red); }
+        .btn-blue { --color-neon: var(--neon-blue); }
+        .btn-green { --color-neon: var(--neon-green); }
+        .btn-purple { --color-neon: var(--neon-purple); }
+
+        .btn-text {
+            font-size: 1.125rem; /* 18px */
+            line-height: 1.2;
+        }
+
+        /* Estilo específico para el botón de volver */
+        .btn-back {
+            width: auto;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* --- Estilos para la nueva página --- */
+
+        .content-title {
+            font-size: 1.75rem; /* 28px */
+            font-weight: 700;
+            text-align: center;
+            color: var(--neon-blue);
+            text-shadow: 0 0 8px var(--neon-blue), 0 0 15px var(--neon-blue);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .content-text {
+            font-weight: 300;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Estilo para el Textarea */
+        #prompt-input {
+            width: 100%;
+            min-height: 100px;
+            background-color: rgba(10, 10, 10, 0.7);
+            border: 2px solid var(--neon-blue);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            color: #f0f0f0;
+            font-family: var(--font-family);
+            font-weight: 300;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 0 5px var(--neon-blue) inset;
+        }
+
+        #prompt-input::placeholder {
+            color: #888;
+        }
+        #prompt-input:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--neon-blue), 0 0 10px var(--neon-blue) inset;
+        }
+
+        /* Botón de envío */
+        #submit-button {
+            --color-neon: var(--neon-green);
+        }
+        
+        #submit-button:disabled {
+            --color-neon: #555;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        /* Indicador de carga */
+        #loading-indicator {
+            display: none; /* Oculto por defecto */
+            text-align: center;
+            color: var(--neon-green);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1.5rem 0;
+            text-shadow: 0 0 8px var(--neon-green);
+        }
+
+        /* Contenedor de respuesta */
+        #gemini-response {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: rgba(10, 10, 10, 0.7);
+            border: 2px solid var(--neon-green);
+            border-radius: 0.75rem;
+            backdrop-filter: blur(3px);
+            box-shadow: 0 0 10px var(--neon-green);
+            color: #f0f0f0;
+            font-weight: 300;
+            font-size: 1rem;
+            line-height: 1.7;
+            white-space: pre-wrap; /* Conserva saltos de línea */
+        }
+        
+        #gemini-response h3 {
+            font-weight: 700;
+            color: var(--neon-green);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        #gemini-response p {
+            margin-bottom: 1rem;
+        }
+
+        /* Contenedor de fuentes */
+        #gemini-sources {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: rgba(10, 10, 10, 0.5);
+            border: 1px solid #555;
+            border-radius: 0.75rem;
+        }
+        
+        #gemini-sources h4 {
+            font-weight: 700;
+            color: #ccc;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        #gemini-sources ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+        }
+        
+        #gemini-sources li {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        #gemini-sources a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        #gemini-sources a:hover {
+            color: #fff;
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+        
+        /* Mensaje de error */
+        #error-message {
+            display: none;
+            text-align: center;
+            color: var(--neon-red);
+            font-weight: 700;
+            margin: 1.5rem 0;
+            text-shadow: 0 0 8px var(--neon-red);
+            padding: 1rem;
+            border: 1px solid var(--neon-red);
+            border-radius: 0.5rem;
+            background-color: rgba(255, 51, 0, 0.1);
+        }
+
+    </style>
+</head>
+<body class="bg-black">
+
+    <div class="main-container">
+        
+        <!-- Botón para regresar al menú principal -->
+        <a href="index.html" class="btn-neon btn-blue btn-back">
+            <span class="btn-text">← Volver</span>
+        </a>
+
+        <h1 class="content-title">
+            ✨ Info-Check
+        </h1>
+
+        <p class="content-text">
+            Pregunta sobre chemsex, sustancias o reducción de daños. Recibe información sin juicios, potenciada por IA.
+        </p>
+
+        <!-- Área de entrada -->
+        <textarea id="prompt-input" rows="4" placeholder="Escribe tu pregunta aquí... (Ej: '¿Es verdad que mezclar X con Y es peligroso?', '¿Qué es la reducción de daños?')"></textarea>
+
+        <button id="submit-button" class="btn-neon">
+            <span class="btn-text">Verificar Información</span>
+        </button>
+
+        <!-- Indicador de Carga -->
+        <div id="loading-indicator">
+            Procesando...
+        </div>
+
+        <!-- Mensaje de Error -->
+        <div id="error-message">
+            Hubo un error al procesar tu solicitud. Por favor, inténtalo de nuevo más tarde.
+        </div>
+
+        <!-- Contenedor de Respuesta -->
+        <div id="gemini-response" class="hidden"></div>
+        
+        <!-- Contenedor de Fuentes -->
+        <div id="gemini-sources" class="hidden"></div>
+
+    </div>
+
+    <script type="module">
+        // --- Lógica de la API de Gemini ---
+
+        const submitButton = document.getElementById('submit-button');
+        const promptInput = document.getElementById('prompt-input');
+        const responseContainer = document.getElementById('gemini-response');
+        const sourcesContainer = document.getElementById('gemini-sources');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorMessage = document.getElementById('error-message');
+
+        const apiKey = ""; // La API key se gestionará automáticamente en el entorno de Canvas
+        const apiUrl = `https://generativelaNguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        
+        // System Prompt: Crítico para mantener el tono de la app
+        const systemPrompt = `
+            Eres un asistente de información para BajadaSegura, una asociación LGTBQ+ afirmativa 
+            enfocada en la reducción de daños en el contexto del chemsex.
+            Tu misión principal es proveer información clara, objetiva y libre de juicios.
+            
+            REGLAS ESTRICTAS:
+            1.  **NO JUZGUES:** Nunca uses lenguaje moralista, paternalista o que implique juicio sobre el
+                consumo de sustancias o las prácticas sexuales.
+            2.  **ENFOQUE EN REDUCCIÓN DE DAÑOS:** Tu objetivo es informar para que la persona pueda
+                tomar decisiones más seguras. Céntrate en los hechos, riesgos y estrategias de seguridad.
+            3.  **NO DES CONSEJO MÉDICO:** No puedes diagnosticar, tratar o dar consejo médico directo.
+                Si la pregunta es sobre una emergencia médica (ej. "creo que tengo una sobredosis"),
+                tu ÚNICA respuesta debe ser instar a buscar ayuda médica urgente (llamar a emergencias).
+                Para otras dudas de salud, sugiere consultar a un profesional sanitario.
+            4.  **SÉ CONCISO Y CLARO:** Usa un lenguaje fácil de entender. Evita la jerga técnica excesiva.
+            5.  **TONO:** Mantén un tono de apoyo, tranquilo, informativo y afirmativo. Usa "tú".
+            6.  **FUENTES:** Basa tus respuestas en la información proporcionada por la búsqueda de Google.
+        `;
+
+        // --- Función de Fetch con Reintentos (Exponential Backoff) ---
+        async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    // Si la respuesta no es OK, pero no es un error de servidor (ej. 400), no reintentes.
+                    if (response.status >= 400 && response.status < 500) {
+                        console.error("Error de cliente:", response.status, await response.text());
+                        throw new Error(`Error ${response.status} (Bad Request). No se reintentará.`);
+                    }
+                    // Si es un error de servidor (5xx) o de rate limiting (429), reintenta.
+                    if (response.status === 429 || response.status >= 500) {
+                        throw new Error(`Error ${response.status}. Reintentando...`);
+                    }
+                }
+                return response.json();
+            } catch (error) {
+                if (retries > 0) {
+                    console.warn(error.message);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithBackoff(url, options, retries - 1, delay * 2); // Duplica el retraso
+                } else {
+                    console.error("Máximos reintentos alcanzados.");
+                    throw error; // Lanza el error final
+                }
+            }
+        }
+
+        // --- Función Principal de la API ---
+        async function callGeminiAPI() {
+            const userQuery = promptInput.value;
+            if (!userQuery.trim()) return;
+
+            // 1. Configurar estado de UI
+            submitButton.disabled = true;
+            submitButton.querySelector('.btn-text').textContent = "Verificando...";
+            loadingIndicator.style.display = 'block';
+            responseContainer.classList.add('hidden');
+            sourcesContainer.classList.add('hidden');
+            errorMessage.style.display = 'none';
+
+            // 2. Construir el Payload
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                // Habilitar la búsqueda de Google para respuestas más fiables
+                tools: [{ "google_search": {} }],
+            };
+            
+            const fetchOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+
+            try {
+                // 3. Llamar a la API con reintentos
+                const result = await fetchWithBackoff(apiUrl, fetchOptions);
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    // 4. Procesar y mostrar la respuesta
+                    const textResponse = candidate.content.parts[0].text;
+                    displayResponse(textResponse);
+                    
+                    // 5. Procesar y mostrar las fuentes (grounding)
+                    const groundingMetadata = candidate.groundingMetadata;
+                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                        displaySources(groundingMetadata.groundingAttributions);
+                    }
+                } else {
+                    console.error("Respuesta inesperada de la API:", result);
+                    throw new Error("La API no devolvió una respuesta válida.");
+                }
+
+            } catch (error) {
+                console.error("Error al llamar a Gemini:", error);
+                errorMessage.style.display = 'block';
+            } finally {
+                // 6. Restaurar estado de UI
+                submitButton.disabled = false;
+                submitButton.querySelector('.btn-text').textContent = "Verificar Información";
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        function displayResponse(text) {
+            // Un pre-procesamiento simple para formato
+            let formattedText = text
+                .replace(/\*\*(.*?)\*\*/g, '<h3>$1</h3>') // Negrita como subtítulo
+                .replace(/\*/g, '<br>• '); // Asteriscos como listas
+
+            responseContainer.innerHTML = formattedText;
+            responseContainer.classList.remove('hidden');
+        }
+
+        function displaySources(attributions) {
+            const sources = attributions
+                .map(attr => attr.web)
+                .filter(web => web?.uri && web?.title); // Filtrar fuentes válidas
+
+            if (sources.length > 0) {
+                let sourceHTML = '<h4>Fuentes de Información:</h4><ul>';
+                sources.forEach(source => {
+                    sourceHTML += `<li><a href="${source.uri}" target="_blank" rel="noopener noreferrer">${source.title || source.uri}</a></li>`;
+                });
+                sourceHTML += '</ul>';
+                
+                sourcesContainer.innerHTML = sourceHTML;
+                sourcesContainer.classList.remove('hidden');
+            }
+        }
+
+        // --- Event Listener ---
+        submitButton.addEventListener('click', callGeminiAPI);
+
+    </script>
+</body>
+</html>
+
