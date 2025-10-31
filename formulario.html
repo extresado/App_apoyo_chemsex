@@ -275,17 +275,20 @@
                     <p id="questionNumber" class="question-number"></p>
                     <p id="questionText" class="question-text"></p>
                 </div>
+                
+                <!-- === BOTÓN "VOLVER" AÑADIDO AQUÍ === -->
+                <div class="text-center pt-1">
+                     <button id="backToPrevQuestionButton" class="btn-neon btn-purple py-2 px-4 text-xs" style="width: auto; --color-neon: var(--neon-purple); margin-bottom: 1rem;">
+                        &larr; Volver a la pregunta anterior
+                    </button>
+                </div>
+                
                 <div id="optionsContainer" class="space-y-1">
                     <!-- Opciones de radio inyectadas aquí -->
                 </div>
-                <div class="flex justify-between pt-4">
-                    <button id="prevButton" class="btn-neon btn-blue py-2 px-6 text-sm" style="width: auto;" disabled>
-                        &larr; Anterior
-                    </button>
-                    <button id="nextButton" class="btn-neon btn-pink py-2 px-6 text-sm" style="width: auto;" disabled>
-                        Siguiente &rarr;
-                    </button>
-                </div>
+                
+                <!-- === BOTONES "ANTERIOR" Y "SIGUIENTE" ELIMINADOS === -->
+                
             </div>
 
             <!-- 2. Paso de Input Personalizado y Ubicación -->
@@ -303,6 +306,7 @@
                     </div>
                 </div>
                 <div class="flex justify-between pt-4">
+                    <!-- Este botón "Anterior" SÍ se mantiene -->
                     <button id="inputPrevButton" class="btn-neon btn-blue py-2 px-6 text-sm" style="width: auto;">
                         &larr; Anterior
                     </button>
@@ -366,6 +370,9 @@
 
     <script>
         // API Key
+        // ¡Recuerda! Esta clave es visible en el código fuente.
+        // Para un proyecto en producción, es vital moverla a un backend
+        // o usar restricciones de API de Google (HTTP referrer).
         const apiKey = "AIzaSyAdE1IgXbIuOq6mLTJGSxKUqPRJjB57I-M"; 
         
         const API_URL_BASE = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
@@ -403,7 +410,7 @@
         ];
 
         // Referencias del DOM (se obtienen después de inicializar)
-        let questionStep, inputStep, actionStep, resultStep, questionNumber, questionText, optionsContainer, prevButton, nextButton, customNotesEl, userLocationEl, inputPrevButton, inputNextButton, finalScoreText, reflectionButton, reflectionSpinner, reflectionButtonText, resourcesButton, resourcesSpinner, resourcesButtonText, resultTitle, resultOutput, resetButton, errorContainer, errorMessage;
+        let questionStep, inputStep, actionStep, resultStep, questionNumber, questionText, optionsContainer, backToPrevQuestionButton, customNotesEl, userLocationEl, inputPrevButton, inputNextButton, finalScoreText, reflectionButton, reflectionSpinner, reflectionButtonText, resourcesButton, resourcesSpinner, resourcesButtonText, resultTitle, resultOutput, resetButton, errorContainer, errorMessage;
 
         // --- Navegación de la Aplicación ---
 
@@ -441,17 +448,25 @@
                         </span>
                     </label>
                 `).join('');
-
-                prevButton.disabled = currentStep === 0;
                 
+                // === LÓGICA DE AVANCE AUTOMÁTICO ===
                 document.querySelectorAll(`input[name="${q.name}"]`).forEach(input => {
                     input.addEventListener('change', () => {
                         scores[currentStep] = input.value;
-                        nextButton.disabled = false;
+                        // Pausa breve para que el usuario vea la selección
+                        setTimeout(() => {
+                            nextStep();
+                        }, 200); // 200ms de retraso
                     });
                 });
                 
-                nextButton.disabled = scores[currentStep] === null;
+                // === LÓGICA DEL BOTÓN "VOLVER" ===
+                // Ocultar en la primera pregunta, mostrar en las demás
+                if (currentStep === 0) {
+                    backToPrevQuestionButton.classList.add('hidden');
+                } else {
+                    backToPrevQuestionButton.classList.remove('hidden');
+                }
 
             } else if (currentStep === questionsData.length) {
                 showStep('input');
@@ -466,16 +481,14 @@
         }
 
         function nextStep() {
-            if (currentStep < questionsData.length) {
-                const checked = document.querySelector(`input[name="${questionsData[currentStep].name}"]:checked`);
-                if (!checked) {
-                    displayError("Por favor, selecciona una opción para continuar.");
-                    return;
-                }
-                scores[currentStep] = checked.value;
+            // Ya no necesitamos comprobar si algo está marcado,
+            // porque esta función solo se llama DESPUÉS de marcar algo.
+            if (currentStep < questionsData.length + 1) { // +1 para incluir el paso de input
                 currentStep++;
                 renderStep();
             }
+            // renderStep() se encargará de mostrar el paso de "input" 
+            // cuando currentStep == questionsData.length
         }
 
         function inputStepNext() {
@@ -493,12 +506,14 @@
         function inputStepPrev() {
             customNotes = customNotesEl.value;
             userLocation = userLocationEl.value.trim();
+            // Esto te llevará de vuelta a la ÚLTIMA pregunta (q10)
             currentStep--;
             renderStep();
         }
 
 
         function prevStep() {
+            // Esta función es llamada por el nuevo botón "Volver"
             if (currentStep > 0) {
                 currentStep--;
                 renderStep();
@@ -541,13 +556,15 @@
                     const response = await fetch(url, options);
                     if (response.status === 429 || response.status >= 500) {
                         if (i === retries - 1) throw new Error(`API failed after ${retries} attempts with status ${response.status}.`);
+                        // Implementar backoff exponencial
                         const delay = INITIAL_DELAY * (2 ** i) + Math.random() * 1000;
                         await new Promise(resolve => setTimeout(resolve, delay));
-                        continue;
+                        continue; // Reintentar
                     }
-                    return response;
+                    return response; // Éxito
                 } catch (error) {
-                    if (i === retries - 1) throw error;
+                    // Capturar errores de red y reintentar
+                    if (i === retries - 1) throw error; // Fallo final
                     const delay = INITIAL_DELAY * (2 ** i) + Math.random() * 1000;
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
@@ -604,7 +621,8 @@
                 const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar la reflexión. Inténtalo de nuevo.";
                 resultOutput.innerHTML = marked(text);
 
-                await handleResourcesSearch(true);
+                // Ahora, buscar recursos
+                await handleResourcesSearch(true); // true = combinado con reflexión
 
             } catch (error) {
                 console.error("Error en la evaluación de Gemini:", error);
@@ -621,6 +639,7 @@
         async function handleResourcesSearch(isReflectionCombined = false) {
             
             if (!isReflectionCombined) {
+                // Modo "Solo Recursos"
                 resourcesButton.disabled = true;
                 reflectionButton.disabled = true;
                 resourcesButtonText.textContent = "Buscando...";
@@ -629,6 +648,7 @@
                 resultOutput.innerHTML = '<p class="text-center font-medium py-8" style="color: var(--neon-blue);">Usando Google Search para encontrar ayuda profesional cerca de ti...</p>';
                 showStep('result');
             } else {
+                // Modo "Combinado" (llamado desde handleReflection)
                 resultOutput.innerHTML += '<p class="text-center font-bold mt-6" style="color: var(--neon-green);">Buscando Recursos LGTBIQ+ Amigables...</p>';
                 reflectionButtonText.textContent = "Buscando Recursos...";
             }
@@ -663,9 +683,9 @@
                 const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo encontrar recursos. Inténtalo de nuevo con una búsqueda más específica.";
                 
                 if (isReflectionCombined) {
-                    resultOutput.innerHTML += marked(text);
+                    resultOutput.innerHTML += marked(text); // Añadir al final
                 } else {
-                    resultOutput.innerHTML = marked(text);
+                    resultOutput.innerHTML = marked(text); // Reemplazar
                 }
 
             } catch (error) {
@@ -679,6 +699,7 @@
                     resultOutput.innerHTML = errorHtml;
                 }
             } finally {
+                // Reactivar botones en ambos casos
                 resourcesButton.disabled = false;
                 reflectionButton.disabled = false;
                 resourcesButtonText.textContent = "Solo Recursos (LGTBIQ+ Amigables)";
@@ -690,25 +711,42 @@
 
         // --- Utilidades de Markdown y Error ---
         
+        // Función simple para convertir Markdown básico a HTML
         function marked(markdown) {
-            let html = markdown
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-                .replace(/^- (.*$)/gim, '<li>$1</li>')
-                .replace(/\n\n/gim, '</p><p>')
-                .replace(/(^<p>|<\/p>$)/g, ''); 
+            // Reemplazar saltos de línea con <br> dentro de párrafos
+            let html = markdown.replace(/\n/g, '<br>');
+
+            // Encabezados
+            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            // Negrita
+            html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+            // Cursiva
+            html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+            // Enlaces
             html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-            if (!html.startsWith('<h') && !html.startsWith('<li') && !html.startsWith('<a')) {
-                html = `<p>${html}</p>`;
-            }
+            
+            // Listas (manejo simple)
+            html = html.replace(/^- (.*$)/gim, '<li>$1</li>');
             html = html.replace(/((?:<li>.*?<\/li>\s*)+)/gs, '<ul>$1</ul>');
-            html = html.replace(/<\/p><ul>/g, '<ul>'); 
-            html = html.replace(/<\/li><p>/g, '</li>'); 
+            
+            // Párrafos (manejo básico para bloques de texto)
+            // Envolver todo lo que no sea una etiqueta de bloque en <p>
+            html = html.split(/<br><br>|<h1>|<h2>|<ul>/).map(segment => {
+                if (segment.startsWith('<h1>') || segment.startsWith('<h2>') || segment.startsWith('<ul>') || segment.trim() === '') {
+                    return segment;
+                }
+                return `<p>${segment}</p>`;
+            }).join('');
+            
+            // Limpieza de etiquetas <br> errantes
+            html = html.replace(/<p><br>/g, '<p>');
+            html = html.replace(/<br><\/p>/g, '</p>');
+            html = html.replace(/<\/ul><br>/g, '</ul>');
             
             return html;
         }
+
 
         function displayError(message) {
             errorMessage.textContent = message;
@@ -731,8 +769,10 @@
             questionNumber = document.getElementById('questionNumber');
             questionText = document.getElementById('questionText');
             optionsContainer = document.getElementById('optionsContainer');
-            prevButton = document.getElementById('prevButton');
-            nextButton = document.getElementById('nextButton');
+            
+            // === Referencias de botones CAMBIADAS ===
+            backToPrevQuestionButton = document.getElementById('backToPrevQuestionButton');
+            
             customNotesEl = document.getElementById('customNotes');
             userLocationEl = document.getElementById('userLocation');
             inputPrevButton = document.getElementById('inputPrevButton');
@@ -750,15 +790,15 @@
             errorContainer = document.getElementById('errorContainer');
             errorMessage = document.getElementById('errorMessage');
 
-            // Asignar listeners
-            nextButton.addEventListener('click', nextStep);
-            prevButton.addEventListener('click', prevStep);
+            // === Asignar listeners CAMBIADOS ===
+            backToPrevQuestionButton.addEventListener('click', prevStep);
+            
             inputNextButton.addEventListener('click', inputStepNext);
             inputPrevButton.addEventListener('click', inputStepPrev);
 
             reflectionButton.addEventListener('click', handleReflection);
             resourcesButton.addEventListener('click', () => {
-                handleResourcesSearch(false);
+                handleResourcesSearch(false); // false = solo recursos
             });
             resetButton.addEventListener('click', resetQuiz);
             
@@ -773,20 +813,30 @@
             const mainAppContainer = document.getElementById('mainAppContainer');
 
             // Mostrar el modal
-            modalOverlay.classList.remove('hidden');
+            if (modalOverlay) {
+                modalOverlay.classList.remove('hidden');
+            }
 
             // Listener para cerrar el modal
-            closeModalButton.addEventListener('click', () => {
-                modalOverlay.classList.add('hidden');
-                mainAppContainer.classList.remove('hidden');
-                
-                // Una vez cerrado, inicializar la app
+            if (closeModalButton) {
+                closeModalButton.addEventListener('click', () => {
+                    modalOverlay.classList.add('hidden');
+                    mainAppContainer.classList.remove('hidden');
+                    
+                    // Una vez cerrado, inicializar la app
+                    initializeApp();
+                });
+            } else {
+                // Fallback si el modal no existe, inicializar directamente
+                // (útil para pruebas si quitas el modal)
+                if (mainAppContainer) {
+                    mainAppContainer.classList.remove('hidden');
+                }
                 initializeApp();
-            });
+            }
         };
 
     </script>
 </body>
 </html>
-
 
