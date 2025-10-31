@@ -67,6 +67,7 @@
             align-items: center;
             width: 100%;
             margin-bottom: 1rem; /* Espacio entre header y slogan */
+            gap: 10px; /* Espacio entre los logos y el botón */
         }
 
         /* Logo en la cabecera (más pequeño) */
@@ -74,7 +75,18 @@
             width: 70px; /* Tamaño reducido */
             height: 70px;
             object-fit: contain; /* Para asegurar que la imagen 'diversas' no se deforme */
+            flex-shrink: 0; /* Evita que el logo pequeño se encoja */
         }
+
+        /* --- CLASE AÑADIDA PARA EL LOGO DE DIVERSAS --- */
+        .logo-diversas {
+            width: 270px;  /* Ajustado de 300px para que quepa */
+            height: 135px; /* Mantiene la proporción 2:1 */
+            object-fit: contain;
+            flex-shrink: 1; /* Permite que se encoja si es necesario en pantallas muy pequeñas */
+            margin: 0 auto; /* Ayuda a centrarlo si hay espacio extra */
+        }
+
 
         /* --- BOTÓN MENÚ HAMBURGUESA --- */
         .hamburger-icon {
@@ -89,6 +101,7 @@
             padding: 0;
             z-index: 1001; /* Encima del overlay */
             position: relative;
+            flex-shrink: 0; /* Evita que el botón se encoja */
         }
 
         .hamburger-icon .bar {
@@ -280,8 +293,8 @@
             <!-- Logo a la izquierda -->
             <img src="https://raw.githubusercontent.com/extresado/App_apoyo_chemsex/main/1000025194.png" alt="Logo BajadaSegura" class="header-logo">
             
-            <!-- Imagen Diversas (Añadida) -->
-            <img src="diversas.png" alt="Logo Diversas Canarias" class="header-logo">
+            <!-- Imagen Diversas (Clase modificada) -->
+            <img src="diversas.png" alt="Logo Diversas Canarias" class="logo-diversas">
 
             <!-- Botón Hamburguesa a la derecha -->
             <button id="menu-btn" class="hamburger-icon" aria-label="Abrir menú">
@@ -355,3 +368,4 @@
 
 </body>
 </html>
+
