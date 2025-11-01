@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Diario de Regulación</title>
+    <!-- Carga de Tailwind CSS para un diseño limpio y adaptable -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Pequeña personalización para el foco */
+        :focus {
+            outline-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <div class="container mx-auto max-w-lg p-4 sm:p-6">
+        <!-- Contenedor principal con sombra y bordes redondeados -->
+        <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+
+            <!-- Título de la aplicación -->
+            <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">
+                Mi Diario de Regulación
+            </h1>
+
+            <!-- Formulario para nuevos registros -->
+            <form id="registro-form" class="space-y-4">
+                
+                <!-- Campo 1: Situación -->
+                <div>
+                    <label for="situacion" class="block text-sm font-medium text-gray-700 mb-1">Situación</label>
+                    <textarea id="situacion" name="situacion" rows="3" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué estaba pasando justo antes?"></textarea>
+                </div>
+
+                <!-- Campo 2: Emoción -->
+                <div>
+                    <label for="emocion" class="block text-sm font-medium text-gray-700 mb-1">Emoción</label>
+                    <select id="emocion" name="emocion" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="">Selecciona una emoción...</option>
+                        <option value="Ansiedad">Ansiedad</option>
+                        <option value="Rabia">Rabia</option>
+                        <option value="Tristeza">Tristeza</option>
+                        <option value="Soledad">Soledad</option>
+                        <option value="Miedo">Miedo</option>
+                        <option value="Vergüenza">Vergüenza</option>
+                        <option value="Vacío">Vacío</option>
+                        <option value="otra">Otra...</option>
+                    </select>
+                </div>
+
+                <!-- Campo para "Otra" emoción, inicialmente oculto -->
+                <div id="otra-emocion-container" class="hidden">
+                    <label for="otra-emocion-texto" class="block text-sm font-medium text-gray-700 mb-1">¿Qué otra emoción?</label>
+                    <input type="text" id="otra-emocion-texto" name="otra-emocion-texto" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Describe la emoción">
+                </div>
+
+                <!-- Campo 3: Pensamiento -->
+                <div>
+                    <label for="pensamiento" class="block text-sm font-medium text-gray-700 mb-1">Pensamiento</label>
+                    <textarea id="pensamiento" name="pensamiento" rows="3" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué pensamiento rápido te vino? (Ej: 'No aguanto más')"></textarea>
+                </div>
+
+                <!-- Campo 4: Conducta -->
+                <div>
+                    <label for="conducta" class="block text-sm font-medium text-gray-700 mb-1">Conducta</label>
+                    <textarea id="conducta" name="conducta" rows="3" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="¿Qué hiciste? (Ej: 'Fumé', 'Salí a caminar')"></textarea>
+                </div>
+
+                <!-- Botón de Guardar -->
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition duration-300 shadow-md">
+                    Guardar Registro
+                </button>
+            </form>
+
+            <!-- Sección de Registros Anteriores -->
+            <div id="historial-container" class="mt-10">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Mis Registros</h2>
+                
+                <!-- Mensaje cuando no hay registros -->
+                <p id="sin-registros" class="text-gray-500 text-center py-4">Aún no hay registros.</p>
+                
+                <!-- Lista donde se añadirán los registros -->
+                <div id="lista-registros" class="space-y-4">
+                    <!-- Los registros se insertarán aquí dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Sección de Generar Informe -->
+            <div id="informe-container" class="mt-10">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Informe</h2>
+                <button id="generar-informe-btn" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:bg-green-700 transition duration-300 shadow-md">
+                    Generar Informe para mi Psicólogo
+                </button>
+
+                <!-- Área del informe, inicialmente oculta -->
+                <div id="reporte" class="hidden mt-4">
+                    <p class="text-sm text-gray-600 mb-2">Copia el siguiente texto y pégalo en nuestra conversación.</p>
+                    <textarea id="informe-texto" readonly class="w-full h-64 p-3 border border-gray-300 rounded-lg bg-gray-50 text-sm"></textarea>
+                    <button id="copiar-btn" class="w-full mt-2 bg-gray-700 text-white py-2 px-4 rounded-lg font-semibold hover:bg-gray-800 transition duration-300">
+                        Copiar Informe
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Constantes y Elementos DOM ---
+            const APP_KEY = 'miDiarioRegistros'; // Clave para localStorage
+            const form = document.getElementById('registro-form');
+            const emocionSelect = document.getElementById('emocion');
+            const otraEmocionContainer = document.getElementById('otra-emocion-container');
+            const otraEmocionInput = document.getElementById('otra-emocion-texto');
+            const sinRegistrosMsg = document.getElementById('sin-registros');
+            const listaRegistros = document.getElementById('lista-registros');
+            const generarInformeBtn = document.getElementById('generar-informe-btn');
+            const reporteContainer = document.getElementById('reporte');
+            const informeTexto = document.getElementById('informe-texto');
+            const copiarBtn = document.getElementById('copiar-btn');
+
+            // --- Funciones ---
+
+            /**
+             * Carga los registros desde localStorage y los muestra en la UI.
+             */
+            function loadRegistros() {
+                const registros = getRegistros();
+                listaRegistros.innerHTML = ''; // Limpiar lista actual
+                
+                if (registros.length === 0) {
+                    sinRegistrosMsg.classList.remove('hidden');
+                } else {
+                    sinRegistrosMsg.classList.add('hidden');
+                    // Mostrar en orden cronológico inverso (el más nuevo primero)
+                    registros.reverse().forEach(renderRegistro);
+                }
+            }
+
+            /**
+             * Obtiene los registros parseados desde localStorage.
+             * @returns {Array} Array de objetos de registro.
+             */
+            function getRegistros() {
+                return JSON.parse(localStorage.getItem(APP_KEY)) || [];
+            }
+
+            /**
+             * Guarda el array de registros en localStorage.
+             * @param {Array} registros - El array de registros a guardar.
+             */
+            function saveRegistros(registros) {
+                localStorage.setItem(APP_KEY, JSON.stringify(registros));
+            }
+
+            /**
+             * Crea el elemento HTML para un solo registro y lo añade a la lista.
+             * @param {Object} registro - El objeto de registro.
+             * @param {boolean} prepend - Si es true, añade al principio (para nuevos registros).
+             */
+            function renderRegistro(registro, prepend = false) {
+                const registroEl = document.createElement('div');
+                registroEl.className = 'bg-gray-100 p-4 rounded-lg shadow-sm border border-gray-200';
+                
+                const fecha = new Date(registro.timestamp).toLocaleString('es-ES', {
+                    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+
+                registroEl.innerHTML = `
+                    <p class="text-xs font-semibold text-gray-500 mb-2">${fecha}</p>
+                    <p class="mb-1"><strong class="font-medium text-gray-900">Situación:</strong> ${registro.situacion}</p>
+                    <p class="mb-1"><strong class="font-medium text-gray-900">Emoción:</strong> <span class="font-semibold text-red-600">${registro.emocion}</span></p>
+                    <p class="mb-1"><strong class="font-medium text-gray-900">Pensamiento:</strong> ${registro.pensamiento}</p>
+                    <p class="mb-1"><strong class="font-medium text-gray-900">Conducta:</strong> ${registro.conducta}</p>
+                `;
+
+                if (prepend) {
+                    listaRegistros.prepend(registroEl);
+                } else {
+                    listaRegistros.appendChild(registroEl);
+                }
+            }
+
+            /**
+             * Maneja el envío del formulario.
+             */
+            function handleSubmit(e) {
+                e.preventDefault(); // Evitar que la página se recargue
+
+                // Obtener valores del formulario
+                const situacion = form.situacion.value.trim();
+                let emocion = form.emocion.value;
+                const pensamiento = form.pensamiento.value.trim();
+                const conducta = form.conducta.value.trim();
+
+                // Manejar emoción "Otra"
+                if (emocion === 'otra') {
+                    emocion = otraEmocionInput.value.trim() || 'Otra (sin especificar)';
+                }
+
+                // Validación simple
+                if (!situacion || !emocion || !pensamiento || !conducta || emocion === 'Selecciona una emoción...') {
+                    // Podríamos añadir un mensaje de error, pero por simplicidad lo omitimos.
+                    // En una app real, aquí iría una validación más robusta.
+                    return; 
+                }
+
+                // Crear el objeto de registro
+                const nuevoRegistro = {
+                    id: Date.now(),
+                    timestamp: new Date().toISOString(),
+                    situacion,
+                    emocion,
+                    pensamiento,
+                    conducta
+                };
+
+                // Guardar en localStorage
+                const registros = getRegistros();
+                registros.push(nuevoRegistro);
+                saveRegistros(registros);
+
+                // Actualizar la UI
+                renderRegistro(nuevoRegistro, true); // Añadir al principio
+                sinRegistrosMsg.classList.add('hidden'); // Ocultar mensaje "sin registros"
+                
+                // Limpiar formulario
+                form.reset();
+                otraEmocionContainer.classList.add('hidden');
+                otraEmocionInput.value = '';
+            }
+
+            /**
+             * Muestra u oculta el campo "Otra" emoción.
+             */
+            function toggleOtraEmocion() {
+                if (emocionSelect.value === 'otra') {
+                    otraEmocionContainer.classList.remove('hidden');
+                } else {
+                    otraEmocionContainer.classList.add('hidden');
+                }
+            }
+
+            /**
+             * Genera el informe de texto para el psicólogo.
+             */
+            function generarInforme() {
+                const registros = getRegistros();
+                if (registros.length === 0) {
+                    informeTexto.value = "Aún no se han guardado registros.";
+                    reporteContainer.classList.remove('hidden');
+                    return;
+                }
+
+                // --- Análisis de Patrones ---
+                const emocionCounts = {};
+                const situacionCounts = {};
+                const pensamientoCounts = {};
+
+                registros.forEach(r => {
+                    emocionCounts[r.emocion] = (emocionCounts[r.emocion] || 0) + 1;
+                    // Para situaciones y pensamientos, podríamos buscar similitudes,
+                    // pero por simplicidad, contaremos solo duplicados exactos.
+                    situacionCounts[r.situacion] = (situacionCounts[r.situacion] || 0) + 1;
+                    pensamientoCounts[r.pensamiento] = (pensamientoCounts[r.pensamiento] || 0) + 1;
+                });
+
+                const findMostFrequent = (counts) => {
+                    if (Object.keys(counts).length === 0) return "N/A";
+                    return Object.entries(counts).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+                };
+
+                const emocionMasFrecuente = findMostFrequent(emocionCounts);
+                const situacionMasFrecuente = findMostFrequent(situacionCounts);
+
+                // --- Construcción del String del Informe ---
+                let reportString = "INFORME DE REGULACIÓN EMOCIONAL\n";
+                reportString += "===================================\n\n";
+                reportString += `Total de registros: ${registros.length}\n\n`;
+
+                reportString += "--- TENDENCIAS PRINCIPALES ---\n";
+                reportString += `Emoción más frecuente: ${emocionMasFrecuente} (registrada ${emocionCounts[emocionMasFrecuente]} veces)\n`;
+                reportString += `Situación más común (exacta): ${situacionMasFrecuente}\n\n`;
+
+                reportString += "--- LISTA COMPLETA DE REGISTROS ---\n\n";
+
+                registros.forEach(r => {
+                    const fecha = new Date(r.timestamp).toLocaleString('es-ES');
+                    reportString += `-----------------------------------\n`;
+                    reportString += `FECHA: ${fecha}\n`;
+                    reportString += `SITUACIÓN: ${r.situacion}\n`;
+                    reportString += `EMOCIÓN: ${r.emocion}\n`;
+                    reportString += `PENSAMIENTO: ${r.pensamiento}\n`;
+                    reportString += `CONDUCTA: ${r.conducta}\n\n`;
+                });
+
+                // Mostrar el informe
+                informeTexto.value = reportString;
+                reporteContainer.classList.remove('hidden');
+            }
+
+            /**
+             * Copia el texto del informe al portapapeles.
+             */
+            function copiarInforme() {
+                informeTexto.select();
+                try {
+                    // execCommand es más compatible en iFrames y webviews que navigator.clipboard
+                    document.execCommand('copy');
+                    
+                    // Feedback visual
+                    const originalText = copiarBtn.textContent;
+                    copiarBtn.textContent = '¡Copiado!';
+                    copiarBtn.classList.add('bg-green-500');
+                    copiarBtn.classList.remove('bg-gray-700');
+
+                    setTimeout(() => {
+                        copiarBtn.textContent = originalText;
+                        copiarBtn.classList.remove('bg-green-500');
+                        copiarBtn.classList.add('bg-gray-700');
+                    }, 2000);
+
+                } catch (err) {
+                    console.error('Error al copiar:', err);
+                    // Feedback de error
+                    const originalText = copiarBtn.textContent;
+                    copiarBtn.textContent = 'Error al copiar';
+                    copiarBtn.classList.add('bg-red-500');
+                    copiarBtn.classList.remove('bg-gray-700');
+                    
+                    setTimeout(() => {
+                        copiarBtn.textContent = originalText;
+                        copiarBtn.classList.remove('bg-red-500');
+                        copiarBtn.classList.add('bg-gray-700');
+                    }, 2000);
+                }
+            }
+
+
+            // --- Asignación de Eventos ---
+            form.addEventListener('submit', handleSubmit);
+            emocionSelect.addEventListener('change', toggleOtraEmocion);
+            generarInformeBtn.addEventListener('click', generarInforme);
+            copiarBtn.addEventListener('click', copiarInforme);
+
+            // --- Carga Inicial ---
+            loadRegistros();
+
+        });
+    </script>
+</body>
+</html>
