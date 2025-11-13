@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modo Chill - BajadaSegura.info</title>
+  <style>
+    :root {
+      --alert: #ff4d4d;
+      --warning: #ffcc00;
+      --safe: #4caf50;
+      --bg: #121212;
+      --card: #1e1e1e;
+      --text: #ffffff;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .btn-start {
+      background: var(--safe);
+      color: black;
+      border: none;
+      padding: 16px 32px;
+      font-size: 1.2em;
+      border-radius: 50px;
+      margin: 20px 0;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .substances {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .sub-btn {
+      background: var(--card);
+      border: 2px solid #444;
+      color: var(--text);
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85em;
+      text-align: center;
+    }
+    .sub-btn.active { border-color: var(--safe); }
+    .timer-card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 25px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    .progress-ring {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto;
+    }
+    .progress-ring-circle {
+      stroke: var(--warning);
+      stroke-width: 8;
+      fill: transparent;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    .time-left {
+      font-size: 1.8em;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    .risk-level {
+      padding: 8px;
+      border-radius: 8px;
+      display: inline-block;
+      font-weight: bold;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Modo Chill</h1>
+  <button class="btn-start" id="startBtn">🕒 Empecé mi sesión</button>
+
+  <div class="substances hidden" id="substanceSelector">
+    <div class="sub-btn" data-sub="mefe" data-interval="120">Mefetamina<br>(2h)</div>
+    <div class="sub-btn" data-sub="ghb" data-interval="120">GHB/GBL<br>(2h)</div>
+    <div class="sub-btn" data-sub="ket" data-interval="60">Ketamina<br>(1h)</div>
+    <div class="sub-btn" data-sub="poppers" data-interval="15">Poppers<br>(15 min)</div>
+  </div>
+
+  <div class="timer-card hidden" id="timerCard">
+    <svg class="progress-ring" viewBox="0 0 120 120">
+      <circle class="progress-ring-circle" r="52" cx="60" cy="60" stroke-dasharray="327" stroke-dashoffset="327"/>
+    </svg>
+    <div class="time-left" id="timeDisplay">2:00</div>
+    <div class="risk-level" id="riskLevel">RIESGO: BAJO</div>
+    <p id="warningMsg" style="margin-top:15px; color:#ffcc00; font-size:0.9em;"></p>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const selector = document.getElementById('substanceSelector');
+    const timerCard = document.getElementById('timerCard');
+    const subButtons = document.querySelectorAll('.sub-btn');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const riskLevel = document.getElementById('riskLevel');
+    const warningMsg = document.getElementById('warningMsg');
+    const circle = document.querySelector('.progress-ring-circle');
+
+    let countdown = null;
+    let endTime = null;
+    let intervalMinutes = 0;
+
+    // Mostrar selector al iniciar
+    startBtn.addEventListener('click', () => {
+      selector.classList.remove('hidden');
+      startBtn.classList.add('hidden');
+    });
+
+    // Elegir sustancia
+    subButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        subButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        intervalMinutes = parseInt(btn.dataset.interval);
+        
+        // Iniciar temporizador
+        const now = new Date();
+        endTime = new Date(now.getTime() + intervalMinutes * 60000);
+        startTimer();
+        selector.classList.add('hidden');
+        timerCard.classList.remove('hidden');
+      });
+    });
+
+    function startTimer() {
+      clearInterval(countdown);
+      updateTimer(); // inmediato
+      countdown = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      const now = new Date();
+      const diff = endTime - now;
+      
+      if (diff <= 0) {
+        clearInterval(countdown);
+        timeDisplay.textContent = "0:00";
+        circle.style.strokeDashoffset = "0";
+        riskLevel.textContent = "RIESGO: ALTO";
+        riskLevel.style.backgroundColor = "var(--alert)";
+        warningMsg.textContent = "⚠️ No repitas dosis. Hidrátate y busca compañía.";
+        // Aquí podrías agregar vibración si el dispositivo lo permite:
+        if ('vibrate' in navigator) {
+          navigator.vibrate([500, 200, 500]);
+        }
+        return;
+      }
+
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+      // Actualizar anillo de progreso
+      const totalSec = intervalMinutes * 60;
+      const elapsedSec = totalSec - (diff / 1000);
+      const dashoffset = 327 * (1 - elapsedSec / totalSec);
+      circle.style.strokeDashoffset = dashoffset;
+
+      // Actualizar nivel de riesgo visual
+      const pct = elapsedSec / totalSec;
+      if (pct < 0.7) {
+        riskLevel.textContent = "RIESGO: BAJO";
+        riskLevel.style.backgroundColor = "var(--safe)";
+        circle.style.stroke = "var(--safe)";
+        warningMsg.textContent = "";
+      } else if (pct < 0.9) {
+        riskLevel.textContent = "RIESGO: MEDIO";
+        riskLevel.style.backgroundColor = "var(--warning)";
+        circle.style.stroke = "var(--warning)";
+        warningMsg.textContent = "";
+      } else {
+        riskLevel.textContent = "RIESGO: ALTO";
+        riskLevel.style.backgroundColor = "var(--alert)";
+        circle.style.stroke = "var(--alert)";
+        warningMsg.textContent = "⚠️ Espera un poco más antes de repetir";
+      }
+    }
+  </script>
+</body>
+</html>
